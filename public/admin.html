@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>لوحة الإدارة — SEVENCARGO</title>
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#06111c">
+  <link rel="icon" href="/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-scope="admin">
+  <!-- login -->
+  <div id="login-view" class="login-wrap hidden">
+    <form id="login-form" class="card login-card">
+      <a href="/" class="brand"><img src="/img/logo.png" alt="SEVENCARGO"></a>
+      <h2 class="center" data-i18n="a_login_title"></h2>
+      <p class="center muted small" data-i18n="a_login_sub"></p>
+      <div class="field"><label data-i18n="a_username"></label><input id="l-user" autocomplete="username" required dir="ltr"></div>
+      <div class="field"><label data-i18n="password"></label><input id="l-pass" type="password" autocomplete="current-password" required dir="ltr"></div>
+      <div class="err" id="l-err"></div>
+      <button class="btn btn-primary btn-block btn-lg" type="submit" data-i18n="login"></button>
+      <div class="row" style="justify-content:space-between;margin-top:14px"><a href="/" class="small" data-i18n="home"></a><button type="button" class="btn btn-ghost btn-sm" data-lang-toggle>English</button></div>
+    </form>
+  </div>
+
+  <!-- app -->
+  <div id="app-view" class="app hidden">
+    <aside class="sidebar" id="sidebar">
+      <a href="/" class="brand"><img src="/img/logo.png" alt=""><span class="name">SEVEN<b>CARGO</b></span></a>
+      <nav class="side-nav" id="side-nav"></nav>
+      <span class="spacer"></span>
+      <div class="small muted" style="padding:10px 12px" id="me-box"></div>
+    </aside>
+    <div class="side-back" id="side-back"></div>
+    <main class="main">
+      <div class="topbar">
+        <button class="btn btn-ghost icon-btn menu-toggle" id="menu-toggle" aria-label="menu">☰</button>
+        <h1 id="page-title"></h1>
+        <div class="dropdown" id="bell-dd">
+          <button class="btn btn-ghost icon-btn bell" id="bell" aria-label="notifications">🔔<span class="count hidden" id="bell-count"></span></button>
+          <div class="dropdown-menu" style="min-width:320px;padding:0"><div class="row" style="padding:10px 12px;border-bottom:1px solid var(--line)"><b data-i18n="a_notifications"></b><span class="spacer"></span><button class="btn btn-ghost btn-sm" id="notif-read" data-i18n="a_mark_read"></button></div><div class="notif-list" id="notif-list"></div></div>
+        </div>
+        <button class="btn btn-ghost btn-sm" data-lang-toggle>English</button>
+        <button class="btn btn-ghost btn-sm" id="logout" data-i18n="logout"></button>
+      </div>
+      <div id="page"></div>
+    </main>
+  </div>
+
+  <script src="/vendor/leaflet/leaflet.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SEVENCARGO — شحن وتوصيل داخل الإمارات</title>
+  <meta name="description" content="SEVENCARGO: استلام وتوصيل الشحنات داخل الإمارات السبع. اطلب شحنتك أونلاين، واعرف السعر فورًا، وتتبع المندوب لحظة بلحظة.">
+  <meta name="theme-color" content="#06111c">
+  <link rel="icon" href="/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-scope="public">
+  <header id="site-header"></header>
+
+  <section class="hero">
+    <div class="container inner">
+      <div class="reveal">
+        <span class="pill" style="margin-bottom:14px"><span class="dot" style="color:var(--cyan)"></span><span data-i18n="h_badge"></span></span>
+        <h1><span data-i18n="h_title1"></span><br><span class="grad" data-i18n="h_title2"></span></h1>
+        <p class="lead" data-i18n="h_lead"></p>
+        <div class="row">
+          <a href="/order" class="btn btn-primary btn-lg" data-i18n="ship_now"></a>
+          <a href="#how" class="btn btn-ghost btn-lg" data-i18n="h_how"></a>
+        </div>
+        <form class="track-box" id="track-form">
+          <input id="track-input" autocomplete="off" data-i18n-ph="h_track_ph" required>
+          <button class="btn btn-primary" type="submit" data-i18n="track"></button>
+        </form>
+      </div>
+      <div class="logo-wrap reveal"><div class="glow"></div><img src="/img/logo.png" alt="SEVENCARGO"></div>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <div class="container">
+      <div class="section-title reveal"><h2 data-i18n="f_title"></h2><p data-i18n="f_sub"></p></div>
+      <div class="grid g3">
+        <div class="card feature reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg></div><h3 data-i18n="f1_t"></h3><p class="muted" data-i18n="f1_d"></p></div>
+        <div class="card feature reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h10M7 13h6"/></svg></div><h3 data-i18n="f2_t"></h3><p class="muted" data-i18n="f2_d"></p></div>
+        <div class="card feature reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="2"/><circle cx="17" cy="18" r="2"/></svg></div><h3 data-i18n="f3_t"></h3><p class="muted" data-i18n="f3_d"></p></div>
+        <div class="card feature reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="13" rx="2"/><path d="M2 10h20"/></svg></div><h3 data-i18n="f4_t"></h3><p class="muted" data-i18n="f4_d"></p></div>
+        <div class="card feature reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><h3 data-i18n="f5_t"></h3><p class="muted" data-i18n="f5_d"></p></div>
+        <div class="card feature reveal"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/><path d="M9 12l2 2 4-4"/></svg></div><h3 data-i18n="f6_t"></h3><p class="muted" data-i18n="f6_d"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="how">
+    <div class="container">
+      <div class="section-title reveal"><h2 data-i18n="how_title"></h2></div>
+      <div class="grid g4 steps">
+        <div class="card step reveal"><h3 data-i18n="s1_t"></h3><p class="muted" data-i18n="s1_d"></p></div>
+        <div class="card step reveal"><h3 data-i18n="s2_t"></h3><p class="muted" data-i18n="s2_d"></p></div>
+        <div class="card step reveal"><h3 data-i18n="s3_t"></h3><p class="muted" data-i18n="s3_d"></p></div>
+        <div class="card step reveal"><h3 data-i18n="s4_t"></h3><p class="muted" data-i18n="s4_d"></p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="coverage">
+    <div class="container">
+      <div class="section-title reveal"><h2 data-i18n="cov_title"></h2><p data-i18n="cov_sub"></p></div>
+      <div class="row reveal" id="emirates" style="justify-content:center"></div>
+    </div>
+  </section>
+
+  <section class="section" id="prohibited">
+    <div class="container">
+      <div class="section-title reveal"><h2 data-i18n="pro_title"></h2><p data-i18n="pro_sub"></p></div>
+      <div class="card reveal"><ul class="prohibited-list" id="prohibited-list"></ul></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="card reveal center" style="padding:36px 20px">
+        <h2 data-i18n="cta_title"></h2>
+        <p class="muted" data-i18n="cta_sub"></p>
+        <div class="row" style="justify-content:center">
+          <a href="/order" class="btn btn-primary btn-lg" data-i18n="ship_now"></a>
+          <a id="cta-wa" class="btn btn-wa btn-lg" target="_blank" rel="noopener"><span data-i18n="whatsapp"></span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer id="site-footer"></footer>
+
+  <script src="/js/common.js"></script>
+  <script src="/js/home.js"></script>
+</body>
+</html>

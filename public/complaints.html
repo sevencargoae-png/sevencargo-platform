@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>الشكاوى — SEVENCARGO</title>
+  <meta name="theme-color" content="#06111c">
+  <link rel="icon" href="/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-scope="public">
+  <header id="site-header"></header>
+  <main class="container" style="max-width:720px;padding:28px 0 20px">
+    <div class="reveal">
+      <h1 data-i18n="c_title" style="font-size:1.8rem"></h1>
+      <p class="muted" data-i18n="c_sub"></p>
+    </div>
+    <form id="c-form" class="card reveal" novalidate>
+      <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+      <div class="grid g2">
+        <div class="field"><label data-i18n="name"></label><input id="c-name" required maxlength="80" autocomplete="name"></div>
+        <div class="field"><label data-i18n="phone"></label><input id="c-phone" required inputmode="tel" dir="ltr" placeholder="05X XXX XXXX" autocomplete="tel"></div>
+        <div class="field"><label><span data-i18n="c_tracking"></span> — <span class="muted" data-i18n="optional"></span></label><input id="c-no" dir="ltr" placeholder="SC12345678"></div>
+        <div class="field"><label data-i18n="c_category"></label>
+          <select id="c-cat">
+            <option value="delay" data-i18n="cc_delay"></option>
+            <option value="damage" data-i18n="cc_damage"></option>
+            <option value="lost" data-i18n="cc_lost"></option>
+            <option value="driver" data-i18n="cc_driver"></option>
+            <option value="payment" data-i18n="cc_payment"></option>
+            <option value="other" data-i18n="cc_other"></option>
+          </select>
+        </div>
+      </div>
+      <div class="field"><label data-i18n="c_body"></label><textarea id="c-body" required maxlength="2000" style="min-height:130px"></textarea></div>
+      <div class="field">
+        <label><span data-i18n="c_photo"></span> — <span class="muted" data-i18n="optional"></span></label>
+        <label class="photo-drop" for="c-photo"><span data-i18n="c_photo_hint"></span><img id="c-prev" class="hidden" alt=""></label>
+        <input type="file" id="c-photo" accept="image/*" class="hidden">
+      </div>
+      <div class="err" id="c-err"></div>
+      <button class="btn btn-primary btn-lg" type="submit" data-i18n="send"></button>
+    </form>
+    <div id="c-done" class="card hidden success-box"></div>
+  </main>
+  <footer id="site-footer"></footer>
+  <script src="/js/common.js"></script>
+  <script>
+  (function () {
+    const { $, t, esc } = SC;
+    SC.addDict({
+      ar: { c_title: 'الشكاوى والملاحظات', c_sub: 'نأخذ كل شكوى بجدية. سيتواصل معك فريقنا في أقرب وقت.', c_tracking: 'رقم الشحنة', c_category: 'نوع الشكوى',
+        cc_delay: 'تأخير في التوصيل', cc_damage: 'تلف في الشحنة', cc_lost: 'فقدان الشحنة', cc_driver: 'سلوك المندوب', cc_payment: 'مشكلة في الدفع', cc_other: 'أخرى',
+        c_body: 'تفاصيل الشكوى', c_photo: 'صورة توضيحية', c_photo_hint: '📷 اضغط لإرفاق صورة', c_done: 'تم استلام شكواك برقم #{id}', c_done_d: 'سيتواصل معك فريق خدمة العملاء قريبًا.', c_min: 'اكتب تفاصيل أكثر (5 أحرف على الأقل)' },
+      en: { c_title: 'Complaints & feedback', c_sub: 'We take every complaint seriously. Our team will contact you shortly.', c_tracking: 'Tracking number', c_category: 'Category',
+        cc_delay: 'Late delivery', cc_damage: 'Damaged parcel', cc_lost: 'Lost parcel', cc_driver: 'Courier behaviour', cc_payment: 'Payment issue', cc_other: 'Other',
+        c_body: 'Details', c_photo: 'Photo', c_photo_hint: '📷 Tap to attach a photo', c_done: 'Complaint received — #{id}', c_done_d: 'Our customer care team will contact you soon.', c_min: 'Please add more details (min 5 characters)' },
+    });
+    SC.renderChrome('complaints'); SC.initLang(); SC.reveal();
+    SC.loadConfig().then(() => { SC.renderChrome('complaints'); SC.setLang(SC.lang); }).catch(() => {});
+    const no = new URLSearchParams(location.search).get('no'); if (no) $('#c-no').value = no;
+    let photo = null;
+    $('#c-photo').addEventListener('change', async (e) => { const f = e.target.files[0]; if (!f) return; try { photo = await SC.compressImage(f); $('#c-prev').src = photo; $('#c-prev').classList.remove('hidden'); } catch (err) { SC.fail(err); } });
+    $('#c-form').addEventListener('submit', async (e) => {
+      e.preventDefault(); $('#c-err').textContent = '';
+      if ($('#c-body').value.trim().length < 5) { $('#c-err').textContent = t('c_min'); return; }
+      const btn = e.target.querySelector('button[type=submit]'); btn.disabled = true;
+      try {
+        const r = await SC.api('/api/complaints', { body: { name: $('#c-name').value, phone: $('#c-phone').value, tracking_no: $('#c-no').value.trim(), category: $('#c-cat').value, body: $('#c-body').value, photo, website: e.target.website.value } });
+        $('#c-form').classList.add('hidden');
+        const d = $('#c-done'); d.classList.remove('hidden');
+        d.innerHTML = `<h2>${esc(t('c_done', { id: r.id }))}</h2><p class="muted">${t('c_done_d')}</p><a class="btn btn-wa" target="_blank" rel="noopener" href="${SC.waLink(SC.contact.whatsapp)}">${t('whatsapp')}</a>`;
+      } catch (err) { $('#c-err').textContent = err.message; } finally { btn.disabled = false; }
+    });
+  })();
+  </script>
+</body>
+</html>

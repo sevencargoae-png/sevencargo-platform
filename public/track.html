@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>تتبع الشحنة — SEVENCARGO</title>
+  <meta name="theme-color" content="#06111c">
+  <link rel="icon" href="/img/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body data-scope="public">
+  <header id="site-header"></header>
+
+  <main class="container" style="padding:28px 0 20px">
+    <div class="reveal">
+      <h1 data-i18n="t_title" style="font-size:1.8rem"></h1>
+      <p class="muted" data-i18n="t_sub"></p>
+      <form class="track-box" id="track-form" style="max-width:640px">
+        <input id="track-input" autocomplete="off" data-i18n-ph="t_ph" required>
+        <button class="btn btn-primary" type="submit" data-i18n="search"></button>
+      </form>
+      <div class="err" id="track-err"></div>
+    </div>
+
+    <section id="list" class="hidden" style="margin-top:24px"></section>
+    <section id="detail" class="hidden" style="margin-top:24px"></section>
+  </main>
+
+  <footer id="site-footer"></footer>
+
+  <script src="/vendor/leaflet/leaflet.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/js/common.js"></script>
+  <script src="/js/track.js"></script>
+</body>
+</html>
