@@ -1,0 +1,24 @@
+databases:
+  - name: sevencargo-db
+    databaseName: sevencargo_db
+    user: sevencargo_db_user
+    plan: basic-256mb
+    diskSizeGB: 5
+    region: frankfurt
+    postgresMajorVersion: "16"
+
+services:
+  - type: web
+    name: sevencargo-platform
+    runtime: node
+    region: frankfurt
+    plan: free
+    branch: main
+    buildCommand: npm install
+    startCommand: node server.js
+    autoDeployTrigger: off
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sevencargo-db
+          property: connectionString
