@@ -237,8 +237,20 @@ CREATE TABLE IF NOT EXISTS notifications (
 CREATE INDEX IF NOT EXISTS notifications_target_idx ON notifications(target, driver_id, read);
 `;
 
+// v2: flexible ordering — only sender phone is mandatory; exact locations can be added later by admin/courier.
+const MIGRATIONS = `
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS pickup_area TEXT NOT NULL DEFAULT '';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS dropoff_area TEXT NOT NULL DEFAULT '';
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS price_pending BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS price_estimated BOOLEAN NOT NULL DEFAULT false;
+${['sender_name', 'pickup_address', 'pickup_lat', 'pickup_lng', 'pickup_emirate', 'receiver_name', 'receiver_phone',
+  'dropoff_address', 'dropoff_lat', 'dropoff_lng', 'dropoff_emirate', 'weight_kg', 'length_cm', 'width_cm', 'height_cm',
+  'content_type', 'distance_km'].map((c) => `ALTER TABLE orders ALTER COLUMN ${c} DROP NOT NULL;`).join('\n')}
+`;
+
 async function migrate() {
   await q(SCHEMA);
+  await q(MIGRATIONS);
   for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) {
     await q('INSERT INTO settings(key, value) VALUES ($1, $2) ON CONFLICT (key) DO NOTHING', [key, JSON.stringify(value)]);
   }

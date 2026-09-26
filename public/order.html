@@ -14,116 +14,125 @@
 <body data-scope="public">
   <header id="site-header"></header>
 
-  <main class="container" style="max-width:860px;padding:28px 0 20px">
+  <main class="container order-page" style="padding:28px 0 20px">
     <div class="reveal">
-      <h1 data-i18n="o_title" style="font-size:1.8rem"></h1>
-      <p class="muted" data-i18n="o_sub"></p>
+      <h1 data-i18n="o_title" style="font-size:1.8rem;margin-bottom:4px"></h1>
+      <p class="muted" data-i18n="o_sub" style="margin-top:0"></p>
     </div>
 
-    <form id="order-form" class="card reveal" novalidate autocomplete="on">
-      <div class="stepper"><div class="st on"></div><div class="st"></div><div class="st"></div><div class="st"></div></div>
+    <form id="order-form" novalidate autocomplete="on">
       <input type="text" name="website" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
 
-      <!-- STEP 1: pickup -->
-      <section class="step-pane" data-step="1">
-        <h2 style="font-size:1.25rem"><span class="pill" style="background:var(--cyan);color:var(--ink)">A</span> <span data-i18n="o_pickup"></span></h2>
-        <div class="row" style="margin-bottom:10px">
-          <button type="button" class="btn btn-ghost btn-sm" id="btn-locate">📍 <span data-i18n="o_use_location"></span></button>
-          <span class="small muted" id="locate-status"></span>
-        </div>
-        <div id="map-pickup" class="map"></div>
-        <p class="hint" data-i18n="o_map_hint"></p>
-        <div class="grid g2">
-          <div class="field"><label data-i18n="o_emirate"></label><select id="pickup-emirate" required></select></div>
-          <div class="field"><label data-i18n="o_address"></label><input id="pickup-address" required maxlength="300" data-i18n-ph="o_address_ph"></div>
-          <div class="field"><label data-i18n="o_sender_name"></label><input id="sender-name" required maxlength="80" autocomplete="name"></div>
-          <div class="field"><label data-i18n="o_sender_phone"></label><input id="sender-phone" required inputmode="tel" dir="ltr" placeholder="05X XXX XXXX" autocomplete="tel"></div>
-        </div>
-      </section>
-
-      <!-- STEP 2: dropoff -->
-      <section class="step-pane hidden" data-step="2">
-        <h2 style="font-size:1.25rem"><span class="pill" style="background:var(--gold);color:var(--ink)">B</span> <span data-i18n="o_dropoff"></span></h2>
-        <div class="row" style="margin-bottom:10px;flex-wrap:nowrap">
-          <input id="drop-search" data-i18n-ph="o_search_ph">
-          <button type="button" class="btn btn-ghost" id="btn-drop-search" data-i18n="search"></button>
-        </div>
-        <div id="drop-results" class="card flat hidden" style="padding:6px;margin-bottom:10px"></div>
-        <div id="map-drop" class="map"></div>
-        <p class="hint" data-i18n="o_map_hint2"></p>
-        <div class="grid g2">
-          <div class="field"><label data-i18n="o_emirate"></label><select id="drop-emirate" required></select></div>
-          <div class="field"><label data-i18n="o_address"></label><input id="drop-address" required maxlength="300" data-i18n-ph="o_address_ph"></div>
-          <div class="field"><label data-i18n="o_receiver_name"></label><input id="receiver-name" required maxlength="80"></div>
-          <div class="field"><label data-i18n="o_receiver_phone"></label><input id="receiver-phone" required inputmode="tel" dir="ltr" placeholder="05X XXX XXXX"></div>
-        </div>
-      </section>
-
-      <!-- STEP 3: parcel -->
-      <section class="step-pane hidden" data-step="3">
-        <h2 style="font-size:1.25rem">📦 <span data-i18n="o_parcel"></span></h2>
-        <div class="field">
-          <label data-i18n="o_photo"></label>
-          <label class="photo-drop" for="photo-input" id="photo-drop"><span data-i18n="o_photo_hint"></span><img id="photo-preview" class="hidden" alt=""></label>
-          <input type="file" id="photo-input" accept="image/*" capture="environment" class="hidden">
-        </div>
-        <div class="grid g4">
-          <div class="field"><label><span data-i18n="o_weight"></span> (<span data-i18n="kg"></span>)</label><input id="weight" type="number" step="0.1" min="0.1" inputmode="decimal" required></div>
-          <div class="field"><label><span data-i18n="o_length"></span> (<span data-i18n="cm"></span>)</label><input id="length" type="number" step="1" min="1" inputmode="numeric" required></div>
-          <div class="field"><label><span data-i18n="o_width"></span> (<span data-i18n="cm"></span>)</label><input id="width" type="number" step="1" min="1" inputmode="numeric" required></div>
-          <div class="field"><label><span data-i18n="o_height"></span> (<span data-i18n="cm"></span>)</label><input id="height" type="number" step="1" min="1" inputmode="numeric" required></div>
-        </div>
-        <p class="hint" id="limits-hint"></p>
-        <div class="grid g2">
-          <div class="field"><label data-i18n="o_content"></label>
-            <select id="content-type" required>
-              <option value="documents" data-i18n="ct_documents"></option>
-              <option value="electronics" data-i18n="ct_electronics"></option>
-              <option value="clothing" data-i18n="ct_clothing"></option>
-              <option value="cosmetics" data-i18n="ct_cosmetics"></option>
-              <option value="household" data-i18n="ct_household"></option>
-              <option value="spare_parts" data-i18n="ct_spare_parts"></option>
-              <option value="gifts" data-i18n="ct_gifts"></option>
-              <option value="other" data-i18n="ct_other"></option>
-            </select>
+      <div class="parties">
+        <!-- SENDER -->
+        <section class="party sender" aria-labelledby="h-sender">
+          <div class="party-head">
+            <span class="party-no">1</span>
+            <div>
+              <h2 id="h-sender" data-i18n="o_sender_h"></h2>
+              <p data-i18n="o_sender_sub"></p>
+            </div>
           </div>
-          <div class="field"><label><span data-i18n="o_value"></span> (<span data-i18n="aed"></span>) — <span class="muted" data-i18n="optional"></span></label><input id="declared-value" type="number" min="0" step="1" inputmode="numeric"></div>
-        </div>
-        <div class="field"><label><span data-i18n="o_desc"></span> — <span class="muted" data-i18n="optional"></span></label><textarea id="description" maxlength="500" data-i18n-ph="o_desc_ph"></textarea></div>
-        <div class="card flat" style="background:rgba(255,107,107,.05);border-color:rgba(255,107,107,.25)">
-          <h3 data-i18n="pro_title2"></h3>
-          <ul class="prohibited-list" id="prohibited-list"></ul>
-          <label class="check" style="margin-top:12px"><input type="checkbox" id="ack-prohibited"> <span data-i18n="o_ack_prohibited"></span></label>
-        </div>
-      </section>
-
-      <!-- STEP 4: price & payment -->
-      <section class="step-pane hidden" data-step="4">
-        <h2 style="font-size:1.25rem">💳 <span data-i18n="o_price_pay"></span></h2>
-        <div class="grid g2">
-          <div>
-            <div class="price-box" id="price-box"><div class="muted" data-i18n="loading"></div></div>
-            <div class="card flat small" style="margin-top:12px" id="summary"></div>
+          <div class="grid g2">
+            <div class="field"><label><span data-i18n="o_sender_phone"></span> <b class="req">*</b></label><input id="sender-phone" inputmode="tel" dir="ltr" placeholder="05X XXX XXXX" autocomplete="tel"></div>
+            <div class="field"><label data-i18n="o_sender_name"></label><input id="sender-name" maxlength="80" autocomplete="name"></div>
+            <div class="field"><label data-i18n="o_emirate"></label><select id="pickup-emirate"></select></div>
+            <div class="field"><label data-i18n="o_area"></label><input id="pickup-area" maxlength="120" data-i18n-ph="o_area_ph"></div>
           </div>
+          <div class="field"><label data-i18n="o_addr_approx"></label><textarea id="pickup-address" maxlength="300" rows="2" data-i18n-ph="o_addr_approx_ph"></textarea></div>
+
+          <details class="exact-loc" id="pickup-exact">
+            <summary>📍 <span data-i18n="o_exact_toggle"></span></summary>
+            <div class="row" style="margin:10px 0">
+              <button type="button" class="btn btn-ghost btn-sm" id="btn-locate" data-i18n="o_use_location"></button>
+              <button type="button" class="btn btn-ghost btn-sm hidden" id="btn-clear-loc" data-i18n="o_clear_loc"></button>
+              <span class="small muted" id="locate-status"></span>
+            </div>
+            <div id="map-pickup" class="map" style="height:260px"></div>
+            <p class="hint" data-i18n="o_map_hint"></p>
+          </details>
+          <p class="party-note" data-i18n="o_sender_note"></p>
+        </section>
+
+        <div class="party-arrow" aria-hidden="true">➜</div>
+
+        <!-- RECEIVER -->
+        <section class="party receiver" aria-labelledby="h-receiver">
+          <div class="party-head">
+            <span class="party-no">2</span>
+            <div>
+              <h2 id="h-receiver" data-i18n="o_receiver_h"></h2>
+              <p data-i18n="o_receiver_sub"></p>
+            </div>
+          </div>
+          <div class="grid g2">
+            <div class="field"><label data-i18n="o_receiver_name"></label><input id="receiver-name" maxlength="80"></div>
+            <div class="field"><label data-i18n="o_receiver_phone"></label><input id="receiver-phone" inputmode="tel" dir="ltr" placeholder="05X XXX XXXX"></div>
+            <div class="field"><label data-i18n="o_emirate"></label><select id="drop-emirate"></select></div>
+            <div class="field"><label data-i18n="o_area"></label><input id="drop-area" maxlength="120" data-i18n-ph="o_area_ph"></div>
+          </div>
+          <div class="field"><label data-i18n="o_addr_approx"></label><textarea id="drop-address" maxlength="300" rows="2" data-i18n-ph="o_addr_approx_ph"></textarea></div>
+          <p class="party-note" data-i18n="o_receiver_note"></p>
+        </section>
+      </div>
+
+      <!-- PARCEL (optional) -->
+      <details class="card parcel-box" id="parcel-box">
+        <summary><span>📦 <b data-i18n="o_parcel"></b></span> <span class="muted small" data-i18n="optional"></span></summary>
+        <div style="margin-top:14px">
+          <div class="field">
+            <label data-i18n="o_photo"></label>
+            <label class="photo-drop" for="photo-input" id="photo-drop"><span data-i18n="o_photo_hint"></span><img id="photo-preview" class="hidden" alt=""></label>
+            <input type="file" id="photo-input" accept="image/*" class="hidden">
+          </div>
+          <div class="grid g4">
+            <div class="field"><label><span data-i18n="o_weight"></span> (<span data-i18n="kg"></span>)</label><input id="weight" type="number" step="0.1" min="0.1" inputmode="decimal"></div>
+            <div class="field"><label><span data-i18n="o_length"></span> (<span data-i18n="cm"></span>)</label><input id="length" type="number" step="1" min="1" inputmode="numeric"></div>
+            <div class="field"><label><span data-i18n="o_width"></span> (<span data-i18n="cm"></span>)</label><input id="width" type="number" step="1" min="1" inputmode="numeric"></div>
+            <div class="field"><label><span data-i18n="o_height"></span> (<span data-i18n="cm"></span>)</label><input id="height" type="number" step="1" min="1" inputmode="numeric"></div>
+          </div>
+          <p class="hint" id="limits-hint"></p>
+          <div class="grid g2">
+            <div class="field"><label data-i18n="o_content"></label>
+              <select id="content-type">
+                <option value="">—</option>
+                <option value="documents" data-i18n="ct_documents"></option>
+                <option value="electronics" data-i18n="ct_electronics"></option>
+                <option value="clothing" data-i18n="ct_clothing"></option>
+                <option value="cosmetics" data-i18n="ct_cosmetics"></option>
+                <option value="household" data-i18n="ct_household"></option>
+                <option value="spare_parts" data-i18n="ct_spare_parts"></option>
+                <option value="gifts" data-i18n="ct_gifts"></option>
+                <option value="other" data-i18n="ct_other"></option>
+              </select>
+            </div>
+            <div class="field"><label><span data-i18n="o_value"></span> (<span data-i18n="aed"></span>)</label><input id="declared-value" type="number" min="0" step="1" inputmode="numeric"></div>
+          </div>
+          <div class="field"><label data-i18n="o_desc"></label><textarea id="description" maxlength="500" data-i18n-ph="o_desc_ph"></textarea></div>
+        </div>
+      </details>
+
+      <!-- PRICE & PAYMENT -->
+      <section class="card">
+        <h2 style="font-size:1.2rem;margin-top:0">💳 <span data-i18n="o_price_pay"></span></h2>
+        <div class="grid g2">
+          <div class="price-box" id="price-box"></div>
           <div>
-            <label data-i18n="o_payment"></label>
             <div class="pay-opts" id="pay-opts">
-              <label class="pay-opt" id="opt-online"><input type="radio" name="pay" value="online"> <span><b data-i18n="pm_online"></b><br><small class="muted" data-i18n="pm_online_d"></small></span></label>
               <label class="pay-opt"><input type="radio" name="pay" value="cash_sender" checked> <span><b data-i18n="pm_cash_sender"></b><br><small class="muted" data-i18n="pm_cash_sender_d"></small></span></label>
               <label class="pay-opt"><input type="radio" name="pay" value="cash_receiver"> <span><b data-i18n="pm_cash_receiver"></b><br><small class="muted" data-i18n="pm_cash_receiver_d"></small></span></label>
+              <label class="pay-opt" id="opt-online"><input type="radio" name="pay" value="online"> <span><b data-i18n="pm_online"></b><br><small class="muted" data-i18n="pm_online_d"></small></span></label>
             </div>
-            <label class="check" style="margin-top:16px"><input type="checkbox" id="accept-terms"> <span data-i18n-html="o_accept_terms"></span></label>
           </div>
         </div>
+        <details class="pro-details">
+          <summary data-i18n="pro_title2"></summary>
+          <ul class="prohibited-list" id="prohibited-list"></ul>
+        </details>
+        <label class="check" style="margin-top:12px"><input type="checkbox" id="accept-terms"> <span data-i18n-html="o_accept_terms"></span></label>
+        <div class="err" id="form-err" role="alert"></div>
+        <button type="submit" class="btn btn-primary btn-lg" id="btn-submit" style="width:100%;margin-top:14px" data-i18n="o_submit"></button>
       </section>
-
-      <div class="err" id="form-err" role="alert"></div>
-      <div class="row" style="margin-top:18px">
-        <button type="button" class="btn btn-ghost" id="btn-back" data-i18n="back"></button>
-        <span class="spacer"></span>
-        <button type="button" class="btn btn-primary btn-lg" id="btn-next" data-i18n="next"></button>
-        <button type="submit" class="btn btn-primary btn-lg hidden" id="btn-submit" data-i18n="o_submit"></button>
-      </div>
     </form>
 
     <div id="success" class="card hidden success-box"></div>

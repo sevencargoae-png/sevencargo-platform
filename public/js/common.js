@@ -78,6 +78,8 @@
       e_note_required_for_reopen: 'اكتب سببًا لتغيير حالة طلب منتهٍ', e_assign_driver_first: 'عيّن مندوبًا أولًا', e_weak_password: 'كلمة المرور ضعيفة',
       e_wrong_password: 'كلمة المرور الحالية غير صحيحة', e_username_exists: 'اسم المستخدم مستخدم مسبقًا', e_already_paid: 'مدفوع مسبقًا',
       e_geo_denied: 'لم يتم السماح بالوصول للموقع. فعّل خدمة الموقع وحاول مجددًا', e_geo_unavailable: 'تعذّر تحديد الموقع',
+      e_invalid_location: 'رابط أو إحداثيات الموقع غير صحيحة', e_price_pending: 'السعر لم يُحدد بعد — تواصل مع العمليات', e_nothing_to_update: 'لا توجد تعديلات', e_invalid_emirate: 'الإمارة غير صحيحة',
+      price_tbd: 'يُحدد لاحقًا', price_est: 'تقديري', loc_pending: '📍 اللوكيشن يُستلم عبر واتساب', parcel_na: 'تفاصيل الشحنة غير مذكورة',
     },
     en: {
       brand: 'SEVENCARGO', home: 'Home', ship_now: 'Ship now', track: 'Track', complaints: 'Complaints', login: 'Sign in',
@@ -114,6 +116,8 @@
       e_note_required_for_reopen: 'Add a reason to change a closed order', e_assign_driver_first: 'Assign a courier first', e_weak_password: 'Password is too weak',
       e_wrong_password: 'Current password is wrong', e_username_exists: 'Username already exists', e_already_paid: 'Already paid',
       e_geo_denied: 'Location permission denied. Enable location services and retry', e_geo_unavailable: 'Could not get your location',
+      e_invalid_location: 'Invalid location link or coordinates', e_price_pending: 'Price not set yet — contact operations', e_nothing_to_update: 'Nothing to update', e_invalid_emirate: 'Invalid emirate',
+      price_tbd: 'To be confirmed', price_est: 'estimate', loc_pending: '📍 Location to be shared on WhatsApp', parcel_na: 'Parcel details not provided',
     },
   });
 
@@ -200,8 +204,19 @@
   };
   SC.status = (s) => `<span class="pill s-${SC.esc(s)}"><span class="dot"></span>${SC.esc(SC.t('st_' + s))}</span>`;
   SC.EMIRATES = { AUH: { ar: 'أبوظبي', en: 'Abu Dhabi' }, DXB: { ar: 'دبي', en: 'Dubai' }, SHJ: { ar: 'الشارقة', en: 'Sharjah' }, AJM: { ar: 'عجمان', en: 'Ajman' }, UAQ: { ar: 'أم القيوين', en: 'Umm Al Quwain' }, RAK: { ar: 'رأس الخيمة', en: 'Ras Al Khaimah' }, FUJ: { ar: 'الفجيرة', en: 'Fujairah' } };
+  // Helpers for orders whose optional fields may be empty.
+  SC.price = (o) => (o.price_pending ? SC.t('price_tbd') : SC.money(o.amount) + (o.price_estimated ? ` <small class="muted">(${SC.t('price_est')})</small>` : ''));
+  SC.addr = (o, side) => [o[side + '_area'], o[side + '_address']].filter(Boolean).join(' — ') || '—';
+  SC.hasPt = (o, side) => o[side + '_lat'] != null && o[side + '_lng'] != null;
+  SC.parcel = (o) => {
+    const parts = [];
+    if (o.content_type) parts.push(SC.t('ct_' + o.content_type));
+    if (o.weight_kg) parts.push(`${o.weight_kg} ${SC.t('kg')}`);
+    if (o.length_cm && o.width_cm && o.height_cm) parts.push(`${o.length_cm}×${o.width_cm}×${o.height_cm} ${SC.t('cm')}`);
+    return parts.length ? parts.join(' · ') : SC.t('parcel_na');
+  };
   SC.em = (c) => (SC.EMIRATES[c] ? SC.EMIRATES[c][SC.lang] : c || '—');
-  SC.phoneFmt = (p) => { const s = String(p || ''); return s.startsWith('971') ? '+971 ' + s.slice(3) : '+' + s; };
+  SC.phoneFmt = (p) => { const s = String(p || ''); if (!s) return '—'; return s.startsWith('971') ? '+971 ' + s.slice(3) : '+' + s; };
   SC.normPhone = (p) => {
     let s = String(p || '').replace(/[^\d]/g, '');
     if (s.startsWith('00')) s = s.slice(2);

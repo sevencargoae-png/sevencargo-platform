@@ -18,7 +18,7 @@
       duty_available: 'حاضر وجاهز', duty_off: 'غير حاضر', inactive: 'موقوف', no_data: 'لا توجد بيانات',
       o_detail: 'تفاصيل الطلب', o_assign: 'تعيين مندوب', o_assign_btn: 'تعيين', o_reassign: 'إعادة تعيين', o_show_all_drivers: 'إظهار كل المندوبين', o_no_drivers: 'لا يوجد مندوبون حاضرون في هذه الإمارة',
       o_distance_from: '{km} كم من الاستلام', o_change_status: 'تغيير الحالة (صلاحية إدارية)', o_apply: 'تطبيق', o_note: 'ملاحظة / سبب',
-      o_mark_paid: 'تسجيل كمدفوع', o_mark_paid_q: 'سبب تسجيل الدفع يدويًا', o_notes: 'ملاحظات داخلية', o_save_notes: 'حفظ الملاحظات', o_unflag: 'تمت المراجعة — إزالة التنبيه',
+      o_mark_paid: 'تسجيل كمدفوع', o_mark_paid_q: 'سبب تسجيل الدفع يدويًا', o_notes: 'ملاحظات داخلية', o_save_notes: 'حفظ الملاحظات', o_needs_loc: 'ينقصه لوكيشن', o_missing: 'ينقص هذا الطلب', o_m_pickup: 'لوكيشن الاستلام', o_m_dropoff: 'لوكيشن التسليم', o_m_price: 'السعر', o_ask_wa: 'اطلبه من العميل على واتساب', wa_ask_loc: 'مرحبًا، معك SEVENCARGO بخصوص شحنتك رقم {no}. من فضلك أرسل لنا لوكيشن الاستلام ولوكيشن المستلم هنا على واتساب.', o_no_pin: 'بدون لوكيشن', o_edit_details: 'إكمال / تعديل بيانات الطلب', o_emirate_l: 'الإمارة', o_area_l: 'المنطقة', o_addr_l: 'العنوان', o_loc_l: 'اللوكيشن (رابط خرائط جوجل أو إحداثيات)', o_loc_ph: 'https://maps.app.goo.gl/… أو 25.2,55.3', o_sname_l: 'اسم المرسل', o_rname_l: 'اسم المستلم', o_rphone_l: 'هاتف المستلم', o_price_l: 'السعر النهائي (درهم) — اتركه فارغًا لعدم التغيير', o_unflag: 'تمت المراجعة — إزالة التنبيه',
       o_flag_banner: '⚠ هذا الطلب عليه تنبيه (استلام/تسليم خارج النطاق أو كود خاطئ متكرر). راجع السجل.',
       o_wa_sender: 'واتساب المرسل', o_wa_receiver: 'واتساب المستلم', o_photos: 'الصور', o_parcel_photo: 'صورة الشحنة', o_pickup_photo: 'صورة الاستلام', o_delivery_photo: 'صورة التسليم',
       o_log: 'سجل العمليات', o_parcel: 'الشحنة', o_declared: 'القيمة المعلنة', o_code: 'كود التسليم', o_force_q: 'المندوب غير حاضر أو من إمارة أخرى. تعيين على أي حال؟',
@@ -40,7 +40,7 @@
       set_geofence: 'نطاق التحقق من الموقع (متر)', set_req_photo: 'إلزام صورة عند التسليم', set_contact: 'التواصل', set_wa: 'رقم واتساب (بالصيغة الدولية)', set_wa_disp: 'طريقة عرض الرقم',
       set_email: 'البريد الإلكتروني', set_prohibited: 'قائمة المواد الممنوعة', set_prohibited_hint: 'سطر لكل مادة بالصيغة: العربي | English', set_saved: 'تم حفظ الإعدادات',
       set_preview: 'مثال: دبي → الشارقة، 28 كم، 7 كجم = {p}',
-      st_users: 'حسابات الموظفين', st_add: 'إضافة موظف', st_role_admin: 'مدير (كل الصلاحيات)', st_role_staff: 'موظف عمليات', st_role: 'الصلاحية', st_active: 'فعّال', st_created: 'تم إنشاء الحساب — كلمة المرور: {pw}',
+      st_users: 'حسابات الموظفين', st_add: 'إضافة موظف', st_role_admin: 'مدير (كل الصلاحيات)', st_role_staff: 'موظف عمليات', st_role: 'الصلاحية', st_active: 'فعّال', stf_created: 'تم إنشاء الحساب — كلمة المرور: {pw}',
       acc_change_pw: 'تغيير كلمة المرور', acc_current: 'كلمة المرور الحالية', acc_new: 'كلمة المرور الجديدة (8 أحرف على الأقل)', acc_changed: 'تم تغيير كلمة المرور، سجّل الدخول مجددًا',
       r_avg: 'المتوسط', r_count: 'عدد التقييمات', enable_notif: 'تفعيل إشعارات سطح المكتب',
     },
@@ -59,7 +59,7 @@
       duty_available: 'On duty', duty_off: 'Off duty', inactive: 'Suspended', no_data: 'No data',
       o_detail: 'Order details', o_assign: 'Assign courier', o_assign_btn: 'Assign', o_reassign: 'Reassign', o_show_all_drivers: 'Show all couriers', o_no_drivers: 'No couriers on duty in this emirate',
       o_distance_from: '{km} km from pickup', o_change_status: 'Change status (admin override)', o_apply: 'Apply', o_note: 'Note / reason',
-      o_mark_paid: 'Mark as paid', o_mark_paid_q: 'Reason for manual payment', o_notes: 'Internal notes', o_save_notes: 'Save notes', o_unflag: 'Reviewed — clear flag',
+      o_mark_paid: 'Mark as paid', o_mark_paid_q: 'Reason for manual payment', o_notes: 'Internal notes', o_save_notes: 'Save notes', o_needs_loc: 'Missing location', o_missing: 'This order is missing', o_m_pickup: 'pickup location', o_m_dropoff: 'delivery location', o_m_price: 'price', o_ask_wa: 'ask the customer on WhatsApp', wa_ask_loc: 'Hello, this is SEVENCARGO about your shipment {no}. Please send us the pickup location and the receiver location here on WhatsApp.', o_no_pin: 'no pin', o_edit_details: 'Complete / edit order details', o_emirate_l: 'Emirate', o_area_l: 'Area', o_addr_l: 'Address', o_loc_l: 'Location (Google Maps link or coordinates)', o_loc_ph: 'https://maps.app.goo.gl/… or 25.2,55.3', o_sname_l: 'Sender name', o_rname_l: 'Receiver name', o_rphone_l: 'Receiver phone', o_price_l: 'Final price (AED) — leave empty to keep', o_unflag: 'Reviewed — clear flag',
       o_flag_banner: '⚠ This order is flagged (pickup/delivery outside zone or repeated wrong code). Check the log.',
       o_wa_sender: 'WhatsApp sender', o_wa_receiver: 'WhatsApp receiver', o_photos: 'Photos', o_parcel_photo: 'Parcel photo', o_pickup_photo: 'Pickup photo', o_delivery_photo: 'Delivery photo',
       o_log: 'Activity log', o_parcel: 'Parcel', o_declared: 'Declared value', o_code: 'Delivery code', o_force_q: 'Courier is off duty or from another emirate. Assign anyway?',
@@ -81,7 +81,7 @@
       set_geofence: 'Location check radius (m)', set_req_photo: 'Require photo on delivery', set_contact: 'Contact', set_wa: 'WhatsApp number (international)', set_wa_disp: 'Display format',
       set_email: 'Email', set_prohibited: 'Prohibited items', set_prohibited_hint: 'One item per line: Arabic | English', set_saved: 'Settings saved',
       set_preview: 'Example: Dubai → Sharjah, 28 km, 7 kg = {p}',
-      st_users: 'Staff accounts', st_add: 'Add staff', st_role_admin: 'Admin (full access)', st_role_staff: 'Operations staff', st_role: 'Role', st_active: 'Active', st_created: 'Account created — password: {pw}',
+      st_users: 'Staff accounts', st_add: 'Add staff', st_role_admin: 'Admin (full access)', st_role_staff: 'Operations staff', st_role: 'Role', st_active: 'Active', stf_created: 'Account created — password: {pw}',
       acc_change_pw: 'Change password', acc_current: 'Current password', acc_new: 'New password (min 8 chars)', acc_changed: 'Password changed, please sign in again',
       r_avg: 'Average', r_count: 'Ratings', enable_notif: 'Enable desktop notifications',
     },
@@ -236,10 +236,10 @@
     ? `<div class="table-wrap"><table><thead><tr>${heads.map((h) => `<th>${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`
     : `<div class="card flat empty">${empty || t('no_data')}</div>`;
   const dutyPill = (d) => !d.active ? `<span class="pill bad">${t('inactive')}</span>` : d.duty_status === 'available' ? `<span class="pill ok"><span class="dot"></span>${t('duty_available')}</span>` : `<span class="pill"><span class="dot" style="color:var(--muted)"></span>${t('duty_off')}</span>`;
-  const orderRow = (o) => `<tr class="click" data-order="${o.id}"><td class="ltr"><b>${esc(o.tracking_no)}</b>${o.flagged ? ' ⚠' : ''}</td><td>${SC.status(o.status)}</td>
-      <td>${esc(SC.em(o.pickup_emirate))} ← ${esc(SC.em(o.dropoff_emirate))}</td><td>${esc(o.sender_name)}<div class="small muted"><span class="ltr">${SC.phoneFmt(o.sender_phone)}</span></div></td>
-      <td>${esc(o.receiver_name)}<div class="small muted"><span class="ltr">${SC.phoneFmt(o.receiver_phone)}</span></div></td><td>${esc(o.driver_name || '—')}</td>
-      <td>${SC.money(o.amount)}<div class="small ${o.payment_status === 'paid' ? '' : 'muted'}">${esc(t('ps_' + o.payment_status))}</div></td><td class="small">${SC.date(o.created_at)}</td></tr>`;
+  const orderRow = (o) => `<tr class="click" data-order="${o.id}"><td class="ltr"><b>${esc(o.tracking_no)}</b>${o.flagged ? ' ⚠' : ''}${o.needs_location && !['delivered', 'cancelled'].includes(o.status) ? ` <span title="${esc(t('o_needs_loc'))}">📍</span>` : ''}</td><td>${SC.status(o.status)}</td>
+      <td>${esc(SC.em(o.pickup_emirate))} ← ${esc(SC.em(o.dropoff_emirate))}</td><td>${esc(o.sender_name || '—')}<div class="small muted"><span class="ltr">${SC.phoneFmt(o.sender_phone)}</span></div></td>
+      <td>${esc(o.receiver_name || '—')}<div class="small muted"><span class="ltr">${SC.phoneFmt(o.receiver_phone)}</span></div></td><td>${esc(o.driver_name || '—')}</td>
+      <td>${SC.price(o)}<div class="small ${o.payment_status === 'paid' ? '' : 'muted'}">${esc(t('ps_' + o.payment_status))}</div></td><td class="small">${SC.date(o.created_at)}</td></tr>`;
   const orderHeads = () => [t('c_no'), t('c_status'), t('c_route'), t('c_sender'), t('c_receiver'), t('c_driver'), t('c_amount'), t('c_date')];
   document.addEventListener('click', (e) => { const r = e.target.closest('tr[data-order]'); if (r && !e.target.closest('button,a')) orderModal(Number(r.dataset.order)); });
 
@@ -313,9 +313,16 @@
       const trackUrl = `${location.origin}/track?no=${o.tracking_no}`;
       const statusMsg = (name) => t('wa_status_msg', { name, no: o.tracking_no, status: t('st_' + o.status), url: trackUrl });
       const canAssign = ['pending', 'assigned', 'failed'].includes(o.status);
-      const withDist = drivers.filter((x) => x.active).map((x) => ({ ...x, km: x.last_lat != null ? haversine(x.last_lat, x.last_lng, o.pickup_lat, o.pickup_lng) : null }));
+      const withDist = drivers.filter((x) => x.active).map((x) => ({ ...x, km: x.last_lat != null && o.pickup_lat != null ? haversine(x.last_lat, x.last_lng, o.pickup_lat, o.pickup_lng) : null }));
       const eligible = withDist.filter((x) => showAll || (x.emirate === o.pickup_emirate && x.duty_status === 'available')).sort((a, b) => (a.km ?? 1e9) - (b.km ?? 1e9));
       const pb = o.price_breakdown || {};
+      const editable = !['delivered', 'cancelled'].includes(o.status);
+      const missing = [];
+      if (editable) {
+        if (!SC.hasPt(o, 'pickup') && !['picked_up'].includes(o.status)) missing.push('o_m_pickup');
+        if (!SC.hasPt(o, 'dropoff')) missing.push('o_m_dropoff');
+        if (o.price_pending) missing.push('o_m_price');
+      }
       const prevChat = openOrderModal.chat ? body.querySelector('#om-chat') : null;
       if (openOrderModal.map) { openOrderModal.map.remove(); openOrderModal.map = null; openOrderModal.driverMarker = null; }
 
@@ -323,16 +330,17 @@
         ${o.flagged ? `<div class="cash-banner" style="margin-bottom:12px;color:var(--danger);border-color:rgba(255,107,107,.5);background:rgba(255,107,107,.08)">${t('o_flag_banner')} <button class="btn btn-sm btn-ghost" id="om-unflag">${t('o_unflag')}</button></div>` : ''}
         <div class="row" style="margin-bottom:12px"><span style="font-size:1.4rem;font-weight:900" class="ltr">${esc(o.tracking_no)}</span>${SC.status(o.status)}<span class="pill ${o.payment_status === 'paid' ? 'ok' : 'warn'}">${esc(t('ps_' + o.payment_status))} · ${esc(t('pm_' + o.payment_method))}</span><span class="spacer"></span>
           <a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="${SC.waLink(o.sender_phone, statusMsg(o.sender_name))}">${t('o_wa_sender')}</a>
-          <a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="${SC.waLink(o.receiver_phone, statusMsg(o.receiver_name))}">${t('o_wa_receiver')}</a></div>
+          ${o.receiver_phone ? `<a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="${SC.waLink(o.receiver_phone, statusMsg(o.receiver_name || ''))}">${t('o_wa_receiver')}</a>` : ''}</div>
+        ${missing.length ? `<div class="cash-banner" style="margin-bottom:12px">📍 ${t('o_missing')}: ${missing.map((k) => esc(t(k))).join('، ')} — <a target="_blank" rel="noopener" href="${SC.waLink(o.sender_phone, t('wa_ask_loc', { no: o.tracking_no }))}">${t('o_ask_wa')}</a></div>` : ''}
         <div class="grid g2">
           <div>
             <div id="om-map" class="map" style="height:280px;margin-bottom:12px"></div>
             <dl class="kv card flat" style="margin-bottom:12px">
-              <dt>${t('c_sender')}</dt><dd>${esc(o.sender_name)} · <a class="ltr" href="tel:+${esc(o.sender_phone)}">${SC.phoneFmt(o.sender_phone)}</a><div class="small muted">A · ${esc(SC.em(o.pickup_emirate))} — ${esc(o.pickup_address)}</div></dd>
-              <dt>${t('c_receiver')}</dt><dd>${esc(o.receiver_name)} · <a class="ltr" href="tel:+${esc(o.receiver_phone)}">${SC.phoneFmt(o.receiver_phone)}</a><div class="small muted">B · ${esc(SC.em(o.dropoff_emirate))} — ${esc(o.dropoff_address)}</div></dd>
-              <dt>${t('o_parcel')}</dt><dd>${esc(t('ct_' + o.content_type))} · ${o.weight_kg} ${t('kg')} · ${o.length_cm}×${o.width_cm}×${o.height_cm} ${t('cm')}${o.description ? `<div class="small muted">${esc(o.description)}</div>` : ''}</dd>
+              <dt>${t('c_sender')}</dt><dd>${esc(o.sender_name || '—')} · <a class="ltr" href="tel:+${esc(o.sender_phone)}">${SC.phoneFmt(o.sender_phone)}</a><div class="small muted">A · ${esc(SC.em(o.pickup_emirate))} — ${esc(SC.addr(o, 'pickup'))}${SC.hasPt(o, 'pickup') ? '' : ' · ' + t('o_no_pin')}</div></dd>
+              <dt>${t('c_receiver')}</dt><dd>${esc(o.receiver_name || '—')} · ${o.receiver_phone ? `<a class="ltr" href="tel:+${esc(o.receiver_phone)}">${SC.phoneFmt(o.receiver_phone)}</a>` : '—'}<div class="small muted">B · ${esc(SC.em(o.dropoff_emirate))} — ${esc(SC.addr(o, 'dropoff'))}${SC.hasPt(o, 'dropoff') ? '' : ' · ' + t('o_no_pin')}</div></dd>
+              <dt>${t('o_parcel')}</dt><dd>${esc(SC.parcel(o))}${o.description ? `<div class="small muted">${esc(o.description)}</div>` : ''}</dd>
               ${o.declared_value != null ? `<dt>${t('o_declared')}</dt><dd>${SC.money(o.declared_value)}</dd>` : ''}
-              <dt>${t('c_amount')}</dt><dd><b>${SC.money(o.amount)}</b> · ${o.distance_km} ${t('km')}<div class="small muted">${t('o_breakdown')}: ${pb.base} + ${pb.distance_fee} + ${pb.weight_fee}${pb.inter_emirate_fee ? ' + ' + pb.inter_emirate_fee : ''}${pb.cod_fee ? ' + ' + pb.cod_fee : ''}${pb.vat ? ' + VAT ' + pb.vat : ''}</div></dd>
+              <dt>${t('c_amount')}</dt><dd><b>${SC.price(o)}</b>${o.distance_km != null ? ` · ${o.distance_km} ${t('km')}` : ''}${pb.base != null && !pb.manual ? `<div class="small muted">${t('o_breakdown')}: ${pb.base} + ${pb.distance_fee} + ${pb.weight_fee}${pb.inter_emirate_fee ? ' + ' + pb.inter_emirate_fee : ''}${pb.cod_fee ? ' + ' + pb.cod_fee : ''}${pb.vat ? ' + VAT ' + pb.vat : ''}</div>` : ''}</dd>
               <dt>${t('o_code')}</dt><dd class="ltr"><b>${esc(o.delivery_code)}</b></dd>
               <dt>${t('c_driver')}</dt><dd>${o.driver ? `${esc(o.driver.name)} · <a class="ltr" href="tel:+${esc(o.driver.phone)}">${SC.phoneFmt(o.driver.phone)}</a>` : '—'}</dd>
               <dt>${t('c_date')}</dt><dd>${SC.date(o.created_at)}</dd>
@@ -345,6 +353,19 @@
             <div class="card flat"><h3>${t('o_log')}</h3><ul class="timeline">${d.events.map((e) => `<li class="${e.flagged || ['failed', 'cancelled', 'rejected'].includes(e.status) ? 'bad' : 'done'}"><div class="t">${esc(t('st_' + e.status))}${e.flagged ? ' ⚠' : ''}</div><div class="d">${SC.date(e.created_at)} · ${esc(t(e.actor_type))}${e.actor_name ? ' (' + esc(e.actor_name) + ')' : ''}${e.note ? ' — ' + esc(e.note) : ''}${e.lat != null ? ` · <a target="_blank" rel="noopener" href="https://www.openstreetmap.org/?mlat=${e.lat}&mlon=${e.lng}#map=17/${e.lat}/${e.lng}">📍</a>` : ''}</div></li>`).join('')}</ul></div>
           </div>
           <div>
+            ${editable ? `<details class="card flat" style="margin-bottom:12px" ${missing.length ? 'open' : ''}><summary style="cursor:pointer;font-weight:800">✏️ ${t('o_edit_details')}</summary>
+              <div class="grid g2" style="margin-top:10px">
+                ${['pickup', 'dropoff'].map((sd) => `<div class="card flat" style="padding:10px;border-top:4px solid ${sd === 'pickup' ? 'var(--cyan)' : '#ff9f43'}"><b>${sd === 'pickup' ? 'A · ' + t('c_sender') : 'B · ' + t('c_receiver')}</b>
+                  <div class="field"><label>${t('o_emirate_l')}</label><select data-ed="${sd}_emirate"><option value="">—</option>${Object.keys(SC.EMIRATES).map((c) => `<option value="${c}" ${o[sd + '_emirate'] === c ? 'selected' : ''}>${esc(SC.em(c))}</option>`).join('')}</select></div>
+                  <div class="field"><label>${t('o_area_l')}</label><input data-ed="${sd}_area" value="${esc(o[sd + '_area'])}"></div>
+                  <div class="field"><label>${t('o_addr_l')}</label><input data-ed="${sd}_address" value="${esc(o[sd + '_address'] || '')}"></div>
+                  <div class="field"><label>${t('o_loc_l')}</label><input data-ed="${sd}_location" dir="ltr" placeholder="${t('o_loc_ph')}" value="${SC.hasPt(o, sd) ? o[sd + '_lat'].toFixed(6) + ',' + o[sd + '_lng'].toFixed(6) : ''}"></div>
+                  ${sd === 'pickup' ? `<div class="field"><label>${t('o_sname_l')}</label><input data-ed="sender_name" value="${esc(o.sender_name || '')}"></div>`
+                    : `<div class="field"><label>${t('o_rname_l')}</label><input data-ed="receiver_name" value="${esc(o.receiver_name || '')}"></div><div class="field"><label>${t('o_rphone_l')}</label><input data-ed="receiver_phone" dir="ltr" value="${esc(o.receiver_phone || '')}"></div>`}
+                </div>`).join('')}
+              </div>
+              ${o.payment_status !== 'paid' ? `<div class="field" style="margin-top:8px"><label>${t('o_price_l')}</label><input type="number" min="0" step="1" data-ed="amount" placeholder="${o.price_pending ? t('price_tbd') : o.amount}"></div>` : ''}
+              <button class="btn btn-primary btn-sm" id="om-save-details" style="margin-top:8px">${t('save')}</button></details>` : ''}
             ${canAssign ? `<div class="card flat" style="margin-bottom:12px"><div class="row"><h3 style="margin:0">${o.driver_id ? t('o_reassign') : t('o_assign')}</h3><span class="spacer"></span><label class="check small" style="margin:0"><input type="checkbox" id="om-all" ${showAll ? 'checked' : ''}> ${t('o_show_all_drivers')}</label></div>
               <div style="margin-top:10px;max-height:260px;overflow:auto">${eligible.length ? eligible.map((x) => `<div class="row" style="padding:8px 0;border-bottom:1px solid var(--line)"><div><b>${esc(x.name)}</b> ${dutyPill(x)}<div class="small muted">${esc(SC.em(x.emirate))} · ${x.active_orders} ${t('c_active_orders')}${x.km != null ? ' · ' + t('o_distance_from', { km: x.km.toFixed(1) }) : ''}${x.route_areas ? ' · ' + esc(x.route_areas.slice(0, 60)) : ''}</div></div><span class="spacer"></span><button class="btn btn-primary btn-sm" data-assign="${x.id}" ${x.id === o.driver_id ? 'disabled' : ''}>${t('o_assign_btn')}</button></div>`).join('') : `<div class="muted small">${t('o_no_drivers')}</div>`}</div></div>` : ''}
             <div class="card flat" style="margin-bottom:12px"><h3>${t('chat')}</h3><div id="om-chat"></div></div>
@@ -356,13 +377,15 @@
         </div>`;
 
       // map
-      const map = SC.makeMap(body.querySelector('#om-map'), [o.pickup_lat, o.pickup_lng], 12);
+      const emC = (c) => (c && SC.EMIRATES[c] ? [SC.EMIRATES[c].lat, SC.EMIRATES[c].lng] : null);
+      const center = SC.hasPt(o, 'pickup') ? [o.pickup_lat, o.pickup_lng] : emC(o.pickup_emirate) || [25.0, 55.4];
+      const map = SC.makeMap(body.querySelector('#om-map'), center, SC.hasPt(o, 'pickup') ? 12 : 9);
       openOrderModal.map = map;
-      const pts = [[o.pickup_lat, o.pickup_lng], [o.dropoff_lat, o.dropoff_lng]];
-      L.marker(pts[0], { icon: SC.pinIcon('A', 'a') }).addTo(map);
-      L.marker(pts[1], { icon: SC.pinIcon('B', 'b') }).addTo(map);
+      const pts = [center];
+      if (SC.hasPt(o, 'pickup')) L.marker([o.pickup_lat, o.pickup_lng], { icon: SC.pinIcon('A', 'a') }).addTo(map);
+      if (SC.hasPt(o, 'dropoff')) { L.marker([o.dropoff_lat, o.dropoff_lng], { icon: SC.pinIcon('B', 'b') }).addTo(map); pts.push([o.dropoff_lat, o.dropoff_lng]); }
       if (o.driver_location && o.driver_id) { openOrderModal.driverMarker = L.marker([o.driver_location.lat, o.driver_location.lng], { icon: SC.carIcon() }).addTo(map); pts.push([o.driver_location.lat, o.driver_location.lng]); }
-      map.fitBounds(L.latLngBounds(pts).pad(0.25));
+      if (pts.length > 1) map.fitBounds(L.latLngBounds(pts).pad(0.25));
       setTimeout(() => map.invalidateSize(), 60);
 
       // chat
@@ -384,6 +407,19 @@
       const paid = body.querySelector('#om-paid');
       if (paid) paid.onclick = async () => { const note = await SC.confirmBox(t('o_mark_paid'), { input: t('o_mark_paid_q') }); if (!note) return; try { await api(`/api/admin/orders/${id}/mark-paid`, { body: { note } }); load(); } catch (e) { SC.fail(e); } };
       body.querySelector('#om-save-notes').onclick = async () => { try { await api(`/api/admin/orders/${id}/notes`, { body: { admin_notes: body.querySelector('#om-notes').value } }); SC.toast(t('save'), 'ok'); } catch (e) { SC.fail(e); } };
+      const sd = body.querySelector('#om-save-details');
+      if (sd) sd.onclick = async () => {
+        const payload = {};
+        body.querySelectorAll('[data-ed]').forEach((inp) => {
+          const k = inp.dataset.ed; const v = inp.value.trim();
+          if (k === 'amount') { if (v !== '') payload.amount = v; return; }
+          const cur = k.endsWith('_location') ? (SC.hasPt(o, k.replace('_location', '')) ? o[k.replace('_location', '_lat')].toFixed(6) + ',' + o[k.replace('_location', '_lng')].toFixed(6) : '') : (o[k] || '');
+          if (v !== String(cur)) payload[k] = v;
+        });
+        if (!Object.keys(payload).length) { SC.toast(t('e_nothing_to_update')); return; }
+        sd.disabled = true;
+        try { await api(`/api/admin/orders/${id}/details`, { body: payload }); SC.toast(t('save'), 'ok'); load(); } catch (e) { SC.fail(e); sd.disabled = false; }
+      };
       const unflag = body.querySelector('#om-unflag'); if (unflag) unflag.onclick = async () => { try { await api(`/api/admin/orders/${id}/unflag`, { body: {} }); load(); } catch (e) { SC.fail(e); } };
     }
     load();
@@ -404,6 +440,7 @@
     });
     r.orders.forEach((o) => {
       const target = ['pending', 'assigned', 'accepted'].includes(o.status) ? [o.pickup_lat, o.pickup_lng] : [o.dropoff_lat, o.dropoff_lng];
+      if (target[0] == null || target[1] == null) return;
       const mk = L.marker(target, { icon: SC.pinIcon(o.status === 'picked_up' ? 'B' : 'A', o.status === 'picked_up' ? 'b' : 'a') }).addTo(liveMap)
         .bindPopup(`<b class="ltr">${esc(o.tracking_no)}</b><br>${esc(t('st_' + o.status))}<br><a href="#" data-open-order="${o.id}">${t('view')}</a>`);
       mk.on('popupopen', (ev) => { const a = ev.popup.getElement().querySelector('[data-open-order]'); if (a) a.onclick = (e2) => { e2.preventDefault(); orderModal(o.id); }; });
@@ -620,11 +657,11 @@
         <td>${u.id === me.id ? '' : `<button class="btn btn-ghost btn-sm" data-urole="${u.id}" data-role="${u.role === 'admin' ? 'staff' : 'admin'}" data-active="${u.active}">${u.role === 'admin' ? t('st_role_staff') : t('st_role_admin')}</button> <button class="btn btn-sm ${u.active ? 'btn-danger' : 'btn-ok'}" data-uact="${u.id}" data-role="${u.role}" data-active="${!u.active}">${u.active ? t('dr_deactivate') : t('dr_activate')}</button> <button class="btn btn-ghost btn-sm" data-upw="${u.id}">${t('dr_reset_pw')}</button>`}</td></tr>`))}</div>`;
     $('#st-form').onsubmit = async (e) => {
       e.preventDefault();
-      try { const r = await api('/api/admin/users', { body: Object.fromEntries(new FormData(e.target).entries()) }); $('#st-out').innerHTML = `<div class="cash-banner">${esc(t('st_created', { pw: r.password }))}</div>`; e.target.reset(); setTimeout(() => go('staff', true), 8000); } catch (err) { SC.fail(err); }
+      try { const r = await api('/api/admin/users', { body: Object.fromEntries(new FormData(e.target).entries()) }); $('#st-out').innerHTML = `<div class="cash-banner">${esc(t('stf_created', { pw: r.password }))}</div>`; e.target.reset(); setTimeout(() => go('staff', true), 8000); } catch (err) { SC.fail(err); }
     };
     el.querySelectorAll('[data-urole]').forEach((b) => b.onclick = async () => { try { await api('/api/admin/users/' + b.dataset.urole, { method: 'PUT', body: { role: b.dataset.role, active: b.dataset.active === 'true' } }); go('staff', true); } catch (e) { SC.fail(e); } });
     el.querySelectorAll('[data-uact]').forEach((b) => b.onclick = async () => { try { await api('/api/admin/users/' + b.dataset.uact, { method: 'PUT', body: { role: b.dataset.role, active: b.dataset.active === 'true' } }); go('staff', true); } catch (e) { SC.fail(e); } });
-    el.querySelectorAll('[data-upw]').forEach((b) => b.onclick = async () => { try { const r = await api(`/api/admin/users/${b.dataset.upw}/password`, { body: {} }); $('#st-out').innerHTML = `<div class="cash-banner">${esc(t('st_created', { pw: r.password }))}</div>`; } catch (e) { SC.fail(e); } });
+    el.querySelectorAll('[data-upw]').forEach((b) => b.onclick = async () => { try { const r = await api(`/api/admin/users/${b.dataset.upw}/password`, { body: {} }); $('#st-out').innerHTML = `<div class="cash-banner">${esc(t('stf_created', { pw: r.password }))}</div>`; } catch (e) { SC.fail(e); } });
   };
 
   // ---------------- account ----------------

@@ -80,7 +80,7 @@ router.get('/orders', wrap(async (req, res) => {
   const offset = Math.max(0, Number(req.query.offset) || 0);
   p.push(limit, offset);
   const { rows } = await q(
-    `SELECT o.id, o.tracking_no, o.status, o.payment_method, o.payment_status, o.amount, o.pickup_emirate, o.dropoff_emirate,
+    `SELECT o.id, o.tracking_no, o.status, o.payment_method, o.payment_status, o.amount, o.price_pending, (o.pickup_lat IS NULL OR o.dropoff_lat IS NULL) AS needs_location, o.pickup_emirate, o.dropoff_emirate,
             o.sender_name, o.sender_phone, o.receiver_name, o.receiver_phone, o.distance_km, o.weight_kg, o.flagged,
             o.created_at, o.updated_at, o.driver_id, d.name AS driver_name, count(*) OVER() AS total
        FROM orders o LEFT JOIN drivers d ON d.id=o.driver_id
@@ -148,6 +148,42 @@ router.post('/orders/:id/status', wrap(async (req, res) => {
   await O.addEvent(id, status, actor(req), note || 'Status changed by admin');
   if (o.driver_id && o.driver_id !== rows[0].driver_id) rt.getIO() && rt.getIO().to('driver:' + o.driver_id).emit('order-changed', { id });
   if (rows[0].driver_id) await rt.notifyDriver(rows[0].driver_id, 'order_status', `Order ${o.tracking_no}: ${status}`, note || '', id);
+  rt.orderChanged(rows[0]);
+  res.json({ ok: true });
+}));
+
+// Operations completes/corrects an order: locations (link or lat,lng), areas, names, receiver phone, price.
+router.post('/orders/:id/details', wrap(async (req, res) => {
+  const id = Number(req.params.id);
+  const b = req.body || {};
+  const o = await O.getOrder(id);
+  if (!o) throw new HttpError(404, 'not_found');
+  const sets = []; const params = [id]; const changed = [];
+  const put = (col, v, label) => { params.push(v); sets.push(`${col}=$${params.length}`); changed.push(label || col); };
+  const txt = (k, max) => { if (b[k] !== undefined) put(k, H.str(b[k], { max, name: k }) || (k.endsWith('_area') ? '' : null)); };
+  for (const side of ['pickup', 'dropoff']) {
+    if (b[side + '_emirate'] !== undefined) put(side + '_emirate', b[side + '_emirate'] ? H.emirateCode(b[side + '_emirate']) : null);
+    txt(side + '_area', 120); txt(side + '_address', 300);
+    if (b[side + '_location'] !== undefined) {
+      if (b[side + '_location'] === '' || b[side + '_location'] === null) { put(side + '_lat', null, side + '_location'); put(side + '_lng', null, side + '_location'); }
+      else { const c = await H.parseLocation(b[side + '_location']); put(side + '_lat', c.lat, side + '_location'); put(side + '_lng', c.lng, side + '_location'); }
+    }
+  }
+  txt('sender_name', 80); txt('receiver_name', 80);
+  if (b.receiver_phone !== undefined) put('receiver_phone', String(b.receiver_phone || '').trim() ? H.phone(b.receiver_phone, 'receiver_phone') : null);
+  if (b.amount !== undefined && b.amount !== '' && b.amount !== null) {
+    if (o.payment_status === 'paid') throw bad('already_paid');
+    const amount = H.num(b.amount, { min: 0, max: 100000, name: 'amount' });
+    put('amount', amount); put('price_pending', false, 'price'); put('price_estimated', false, 'price');
+    params.push(JSON.stringify({ ...(o.price_breakdown || {}), pending: false, manual: true, total: amount })); sets.push(`price_breakdown=$${params.length}`);
+  }
+  if (!sets.length) throw bad('nothing_to_update');
+  const { rows } = await q(`UPDATE orders SET ${sets.join(', ')}, updated_at=now() WHERE id=$1 RETURNING *`, params);
+  await O.addEvent(id, 'note', actor(req), 'Order details updated: ' + [...new Set(changed)].join(', '));
+  if (rows[0].driver_id) {
+    await rt.notifyDriver(rows[0].driver_id, 'order_status', `Order ${o.tracking_no} updated`, [...new Set(changed)].join(', '), id);
+    rt.getIO() && rt.getIO().to('driver:' + rows[0].driver_id).emit('order-changed', { id });
+  }
   rt.orderChanged(rows[0]);
   res.json({ ok: true });
 }));

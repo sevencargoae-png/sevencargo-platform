@@ -58,7 +58,7 @@
       <th>${t('t_no')}</th><th>${t('t_status')}</th><th>${t('t_route')}</th><th>${t('t_amount')}</th><th></th></tr></thead><tbody>
       ${orders.map((o) => `<tr class="click" data-id="${o.id}"><td class="ltr"><b>${esc(o.tracking_no)}</b></td><td>${SC.status(o.status)}</td>
         <td>${esc(t('t_from_to', { a: SC.em(o.pickup_emirate), b: SC.em(o.dropoff_emirate) }))}<div class="small muted">${SC.date(o.created_at)}</div></td>
-        <td>${SC.money(o.amount)}</td><td><button class="btn btn-ghost btn-sm">${t('t_open')}</button></td></tr>`).join('')}
+        <td>${SC.price(o)}</td><td><button class="btn btn-ghost btn-sm">${t('t_open')}</button></td></tr>`).join('')}
       </tbody></table></div>`;
     el.querySelectorAll('tr[data-id]').forEach((tr) => tr.addEventListener('click', () => openOrder(Number(tr.dataset.id))));
   }
@@ -118,11 +118,11 @@
           </div>
           <div class="card" style="margin-bottom:16px">
             <dl class="kv">
-              <dt>${t('t_sender')}</dt><dd>${esc(o.sender_name)} · <span class="ltr">${SC.phoneFmt(o.sender_phone)}</span><div class="small muted">${esc(SC.em(o.pickup_emirate))} — ${esc(o.pickup_address)}</div></dd>
-              <dt>${t('t_receiver')}</dt><dd>${esc(o.receiver_name)} · <span class="ltr">${SC.phoneFmt(o.receiver_phone)}</span><div class="small muted">${esc(SC.em(o.dropoff_emirate))} — ${esc(o.dropoff_address)}</div></dd>
-              <dt>${t('t_parcel')}</dt><dd>${esc(t('ct_' + o.content_type))} · ${esc(t('t_weight_dims', { w: o.weight_kg, l: o.length_cm, wd: o.width_cm, h: o.height_cm }))}</dd>
+              <dt>${t('t_sender')}</dt><dd>${esc(o.sender_name || '—')} · <span class="ltr">${SC.phoneFmt(o.sender_phone)}</span><div class="small muted">${esc(SC.em(o.pickup_emirate))} — ${esc(SC.addr(o, 'pickup'))}</div></dd>
+              <dt>${t('t_receiver')}</dt><dd>${esc(o.receiver_name || '—')} · <span class="ltr">${SC.phoneFmt(o.receiver_phone)}</span><div class="small muted">${esc(SC.em(o.dropoff_emirate))} — ${esc(SC.addr(o, 'dropoff'))}</div>${!SC.hasPt(o, 'dropoff') && !final ? `<div class="small" style="margin-top:4px">${t('loc_pending')} — <a target="_blank" rel="noopener" href="${SC.waLink(SC.contact.whatsapp, o.tracking_no)}">${t('whatsapp')}</a></div>` : ''}</dd>
+              <dt>${t('t_parcel')}</dt><dd>${esc(SC.parcel(o))}</dd>
               <dt>${t('t_payment')}</dt><dd>${esc(t('pm_' + o.payment_method))}</dd>
-              <dt>${t('t_amount')}</dt><dd><b>${SC.money(o.amount)}</b> <span class="small muted">(${o.distance_km} ${t('km')})</span></dd>
+              <dt>${t('t_amount')}</dt><dd><b>${SC.price(o)}</b>${o.distance_km != null ? ` <span class="small muted">(${o.distance_km} ${t('km')})</span>` : ''}</dd>
             </dl>
             ${o.photo_url ? `<img class="photo-thumb" style="margin-top:12px" src="${esc(o.photo_url)}" alt="">` : ''}
             ${o.delivery_photo_url ? `<div class="small muted" style="margin-top:12px">${t('t_proof')}</div><img class="photo-thumb" src="${esc(o.delivery_photo_url)}" alt="">` : ''}
@@ -141,13 +141,15 @@
 
     // map
     if (map) { map.remove(); map = null; driverMarker = null; }
-    map = SC.makeMap($('#map'), [o.pickup_lat, o.pickup_lng], 12);
-    const a = L.marker([o.pickup_lat, o.pickup_lng], { icon: SC.pinIcon('A', 'a') }).addTo(map);
-    const b = L.marker([o.dropoff_lat, o.dropoff_lng], { icon: SC.pinIcon('B', 'b') }).addTo(map);
-    const pts = [a.getLatLng(), b.getLatLng()];
+    const emC = (c) => (c && SC.EMIRATES[c] ? [SC.EMIRATES[c].lat, SC.EMIRATES[c].lng] : null);
+    const center = SC.hasPt(o, 'pickup') ? [o.pickup_lat, o.pickup_lng] : emC(o.pickup_emirate) || emC(o.dropoff_emirate) || [25.0, 55.4];
+    map = SC.makeMap($('#map'), center, SC.hasPt(o, 'pickup') ? 12 : 9);
+    const pts = [];
+    if (SC.hasPt(o, 'pickup')) pts.push(L.marker([o.pickup_lat, o.pickup_lng], { icon: SC.pinIcon('A', 'a') }).addTo(map).getLatLng());
+    if (SC.hasPt(o, 'dropoff')) pts.push(L.marker([o.dropoff_lat, o.dropoff_lng], { icon: SC.pinIcon('B', 'b') }).addTo(map).getLatLng());
     if (o.driver_location) { moveDriver(o.driver_location); pts.push(driverMarker.getLatLng()); }
-    map.fitBounds(L.latLngBounds(pts).pad(0.25));
-    if (!final) L.polyline([[o.pickup_lat, o.pickup_lng], [o.dropoff_lat, o.dropoff_lng]], { color: '#14dbdb', weight: 3, dashArray: '6 8', opacity: 0.7 }).addTo(map);
+    if (pts.length > 1) map.fitBounds(L.latLngBounds(pts).pad(0.25)); else if (pts.length === 1) map.setView(pts[0], 13);
+    if (!final && SC.hasPt(o, 'pickup') && SC.hasPt(o, 'dropoff')) L.polyline([[o.pickup_lat, o.pickup_lng], [o.dropoff_lat, o.dropoff_lng]], { color: '#14dbdb', weight: 3, dashArray: '6 8', opacity: 0.7 }).addTo(map);
 
     // actions
     const payBtn = $('#btn-pay');

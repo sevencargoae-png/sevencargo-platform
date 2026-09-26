@@ -109,6 +109,8 @@ async function geofence(req, o, target, b) {
   const lat = H.num(b.lat, { min: -90, max: 90, name: 'location' });
   const lng = H.num(b.lng, { min: -180, max: 180, name: 'location' });
   const dest = target === 'pickup' ? { lat: o.pickup_lat, lng: o.pickup_lng } : { lat: o.dropoff_lat, lng: o.dropoff_lng };
+  // No exact address was given by the customer: the courier's position becomes the recorded point.
+  if (dest.lat == null || dest.lng == null) return { lat, lng, meters: 0, outside: false, note: null, settings: s, setPoint: true };
   const meters = Math.round(H.haversineKm({ lat, lng }, dest) * 1000);
   const outside = meters > Number(s.limits.geofence_m || 500);
   let note = null;
@@ -119,9 +121,22 @@ async function geofence(req, o, target, b) {
   return { lat, lng, meters, outside, note, settings: s };
 }
 
+// Courier saves an exact location received from the customer (WhatsApp pin / Google Maps link / "lat,lng").
+router.post('/orders/:id/location', wrap(async (req, res) => {
+  const b = req.body || {};
+  const target = b.target === 'pickup' ? 'pickup' : 'dropoff';
+  const o = await ownOrder(req, target === 'pickup' ? ['accepted'] : ['accepted', 'picked_up']);
+  const c = await H.parseLocation(b.location);
+  const { rows } = await q(`UPDATE orders SET ${target}_lat=$2, ${target}_lng=$3, updated_at=now() WHERE id=$1 RETURNING *`, [o.id, c.lat, c.lng]);
+  await O.addEvent(o.id, 'note', actor(req), `${target === 'pickup' ? 'Pickup' : 'Delivery'} location set by courier`, c.lat, c.lng);
+  rt.orderChanged(rows[0]);
+  res.json({ ok: true, ...c });
+}));
+
 router.post('/orders/:id/pickup', wrap(async (req, res) => {
   const b = req.body || {};
   const o = await ownOrder(req, ['accepted']);
+  if (o.price_pending && o.payment_status !== 'paid' && o.payment_method === 'cash_sender') throw bad('price_pending');
   const g = await geofence(req, o, 'pickup', b);
   const photoId = await H.saveDataUrl(b.photo, { required: true, name: 'photo' });
   const collectNow = o.payment_method === 'cash_sender' && o.payment_status !== 'paid';
@@ -130,11 +145,12 @@ router.post('/orders/:id/pickup', wrap(async (req, res) => {
     `UPDATE orders SET status='picked_up', picked_up_at=now(), pickup_photo_id=$2, updated_at=now(),
             flagged = flagged OR $3,
             payment_status = CASE WHEN $4 THEN 'paid' ELSE payment_status END,
-            cash_collected = CASE WHEN $4 THEN amount ELSE cash_collected END
-      WHERE id=$1 AND status='accepted' RETURNING *`, [o.id, photoId, g.outside, collectNow]
+            cash_collected = CASE WHEN $4 THEN amount ELSE cash_collected END,
+            pickup_lat = coalesce(pickup_lat, $5), pickup_lng = coalesce(pickup_lng, $6)
+      WHERE id=$1 AND status='accepted' RETURNING *`, [o.id, photoId, g.outside, collectNow, g.lat, g.lng]
   );
   if (!rows[0]) throw bad('invalid_status_for_action');
-  await O.addEvent(o.id, 'picked_up', actor(req), g.outside ? `Outside pickup zone by ${g.meters} m: ${g.note}` : `Within ${g.meters} m`, g.lat, g.lng, g.outside);
+  await O.addEvent(o.id, 'picked_up', actor(req), g.setPoint ? 'Pickup point recorded from courier GPS' : g.outside ? `Outside pickup zone by ${g.meters} m: ${g.note}` : `Within ${g.meters} m`, g.lat, g.lng, g.outside);
   if (collectNow) await O.addEvent(o.id, 'cash_collected', actor(req), `AED ${o.amount} from sender`, g.lat, g.lng);
   if (g.outside) await rt.notifyAdmins('flag', `⚠ Pickup outside zone (${g.meters} m)`, `${o.tracking_no} — ${req.driver.name}: ${g.note}`, o.id);
   rt.orderChanged(rows[0]);
@@ -144,6 +160,7 @@ router.post('/orders/:id/pickup', wrap(async (req, res) => {
 router.post('/orders/:id/deliver', wrap(async (req, res) => {
   const b = req.body || {};
   const o = await ownOrder(req, ['picked_up']);
+  if (o.price_pending && o.payment_status !== 'paid' && o.payment_method === 'cash_receiver') throw bad('price_pending');
   const code = String(b.code || '').trim();
   if (code !== o.delivery_code) {
     await O.addEvent(o.id, 'note', actor(req), 'Wrong delivery code entered', null, null, true);
@@ -162,11 +179,12 @@ router.post('/orders/:id/deliver', wrap(async (req, res) => {
     `UPDATE orders SET status='delivered', delivered_at=now(), delivery_photo_id=$2, updated_at=now(),
             flagged = flagged OR $3,
             payment_status = CASE WHEN $4 THEN 'paid' ELSE payment_status END,
-            cash_collected = CASE WHEN $4 THEN amount ELSE cash_collected END
-      WHERE id=$1 AND status='picked_up' RETURNING *`, [o.id, photoId, g.outside, collectNow]
+            cash_collected = CASE WHEN $4 THEN amount ELSE cash_collected END,
+            dropoff_lat = coalesce(dropoff_lat, $5), dropoff_lng = coalesce(dropoff_lng, $6)
+      WHERE id=$1 AND status='picked_up' RETURNING *`, [o.id, photoId, g.outside, collectNow, g.lat, g.lng]
   );
   if (!rows[0]) throw bad('invalid_status_for_action');
-  await O.addEvent(o.id, 'delivered', actor(req), g.outside ? `Outside delivery zone by ${g.meters} m: ${g.note}` : `Within ${g.meters} m, code verified`, g.lat, g.lng, g.outside);
+  await O.addEvent(o.id, 'delivered', actor(req), g.setPoint ? 'Delivery point recorded from courier GPS, code verified' : g.outside ? `Outside delivery zone by ${g.meters} m: ${g.note}` : `Within ${g.meters} m, code verified`, g.lat, g.lng, g.outside);
   if (collectNow) await O.addEvent(o.id, 'cash_collected', actor(req), `AED ${o.amount} from receiver`, g.lat, g.lng);
   await rt.notifyAdmins(g.outside ? 'flag' : 'order_delivered', g.outside ? `⚠ Delivered outside zone (${g.meters} m)` : `Delivered ${o.tracking_no}`, `${req.driver.name}`, o.id);
   rt.orderChanged(rows[0]);

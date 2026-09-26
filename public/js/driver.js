@@ -16,7 +16,7 @@
       take_photo: '📷 التقط صورة للشحنة', photo_taken: 'تم التقاط الصورة ✓', cash_ok: 'استلمت المبلغ نقدًا: {amount}', code: 'كود التسليم من المستلم',
       locating: 'جارِ تحديد موقعك…', outside: 'أنت على بعد {m} متر من الموقع المحدد. اكتب السبب للمتابعة (سيتم إبلاغ الإدارة):', override: 'السبب',
       picked_ok: 'تم تأكيد الاستلام', delivered_ok: 'تم التسليم بنجاح 🎉', failed_ok: 'تم إبلاغ الإدارة',
-      order_chat: 'محادثة الطلب', details: 'التفاصيل', parcel: 'الشحنة', google: 'Google Maps', waze: 'Waze',
+      order_chat: 'محادثة الطلب', details: 'التفاصيل', parcel: 'الشحنة', google: 'Google Maps', waze: 'Waze', no_pin: '📍 لا يوجد لوكيشن — اطلبه من العميل على واتساب ثم احفظه', set_loc: '📍 حفظ اللوكيشن', set_loc_q: 'الصق رابط اللوكيشن (خرائط جوجل) أو الإحداثيات', loc_saved: 'تم حفظ اللوكيشن', ask_loc: 'اطلب اللوكيشن', ask_loc_msg: 'مرحبًا، معك مندوب SEVENCARGO بخصوص الشحنة رقم {no}. من فضلك أرسل لي {what} هنا على واتساب.', what_pickup: 'لوكيشن الاستلام', what_drop: 'لوكيشن المستلم (التسليم)', price_pending_banner: '⚠ السعر لم يُحدد بعد — تواصل مع العمليات قبل التحصيل',
       r_title: 'إرسال بلاغ / ظرف طارئ', r_cat: 'نوع البلاغ', r_order: 'الطلب المرتبط', r_none: 'بدون', r_body: 'اوصف المشكلة أو الظرف الطارئ', r_photo: '📷 صورة المشكلة', r_send: 'إرسال البلاغ',
       r_sent: 'تم إرسال البلاغ للإدارة', r_mine: 'بلاغاتي', r_loc_note: 'سيتم إرفاق موقعك الحالي تلقائيًا',
       ic_accident: 'حادث', ic_vehicle: 'عطل مركبة', ic_customer: 'مشكلة مع عميل', ic_address: 'عنوان غير صحيح', ic_damage: 'تلف شحنة', ic_emergency: 'ظرف طارئ', ic_other: 'أخرى',
@@ -37,7 +37,7 @@
       take_photo: '📷 Take a photo of the parcel', photo_taken: 'Photo captured ✓', cash_ok: 'I collected the cash: {amount}', code: 'Delivery code from receiver',
       locating: 'Getting your location…', outside: 'You are {m} m from the set location. Enter a reason to continue (operations will be notified):', override: 'Reason',
       picked_ok: 'Pickup confirmed', delivered_ok: 'Delivered successfully 🎉', failed_ok: 'Operations notified',
-      order_chat: 'Order chat', details: 'Details', parcel: 'Parcel', google: 'Google Maps', waze: 'Waze',
+      order_chat: 'Order chat', details: 'Details', parcel: 'Parcel', google: 'Google Maps', waze: 'Waze', no_pin: '📍 No location yet — ask the customer on WhatsApp, then save it', set_loc: '📍 Save location', set_loc_q: 'Paste the location link (Google Maps) or coordinates', loc_saved: 'Location saved', ask_loc: 'Ask for location', ask_loc_msg: 'Hello, this is your SEVENCARGO courier about shipment {no}. Please send me the {what} here on WhatsApp.', what_pickup: 'pickup location', what_drop: 'receiver (delivery) location', price_pending_banner: '⚠ Price not set yet — contact operations before collecting',
       r_title: 'Send a report / emergency', r_cat: 'Type', r_order: 'Related order', r_none: 'None', r_body: 'Describe the problem or emergency', r_photo: '📷 Photo of the problem', r_send: 'Send report',
       r_sent: 'Report sent to operations', r_mine: 'My reports', r_loc_note: 'Your current location will be attached automatically',
       ic_accident: 'Accident', ic_vehicle: 'Vehicle breakdown', ic_customer: 'Customer issue', ic_address: 'Wrong address', ic_damage: 'Parcel damage', ic_emergency: 'Emergency', ic_other: 'Other',
@@ -161,13 +161,13 @@
     if (scope === 'active') { const b = $('#b-orders'); const n = orders.filter((o) => o.status === 'assigned').length; b.textContent = n; b.classList.toggle('hidden', !n); }
     if (!orders.length) { v.innerHTML = `<div class="empty">${t(scope === 'active' ? 'no_orders' : 'no_history')}</div>`; return; }
     v.innerHTML = orders.map((o) => card(o, scope)).join('');
-    v.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => action(b.dataset.act, Number(b.dataset.id))));
+    v.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => action(b.dataset.act, Number(b.dataset.id), b.dataset.target)));
   }
   function card(o, scope) {
     const toPickup = ['assigned', 'accepted'].includes(o.status);
     const target = toPickup ? { lat: o.pickup_lat, lng: o.pickup_lng } : { lat: o.dropoff_lat, lng: o.dropoff_lng };
     const cashWho = o.payment_method === 'cash_sender' ? t('who_sender') : t('who_receiver');
-    const cash = o.cash_to_collect > 0 ? `<div class="cash-banner">💵 ${esc(t('collect', { who: cashWho, amount: SC.money(o.cash_to_collect) }))}</div>` : `<div class="cash-banner" style="color:var(--ok);border-color:rgba(46,204,143,.4);background:rgba(46,204,143,.08)">✓ ${t('collect_none')}</div>`;
+    const cash = o.price_pending && o.payment_status !== 'paid' ? `<div class="cash-banner">${t('price_pending_banner')}</div>` : o.cash_to_collect > 0 ? `<div class="cash-banner">💵 ${esc(t('collect', { who: cashWho, amount: SC.money(o.cash_to_collect) }))}</div>` : `<div class="cash-banner" style="color:var(--ok);border-color:rgba(46,204,143,.4);background:rgba(46,204,143,.08)">✓ ${t('collect_none')}</div>`;
     let actions = '';
     if (scope === 'active') {
       if (o.status === 'assigned') actions = `<button class="btn btn-primary" data-act="accept" data-id="${o.id}">${t('accept')}</button><button class="btn btn-danger" data-act="reject" data-id="${o.id}">${t('reject')}</button>`;
@@ -175,19 +175,25 @@
       else if (o.status === 'picked_up') actions = `<button class="btn btn-primary" data-act="deliver" data-id="${o.id}">${t('confirm_delivery')}</button><button class="btn btn-danger" data-act="fail" data-id="${o.id}">${t('fail')}</button>`;
       actions += `<button class="btn btn-ghost" data-act="chat" data-id="${o.id}">💬 ${t('order_chat')}</button>`;
     }
-    const person = toPickup ? { n: o.sender_name, p: o.sender_phone } : { n: o.receiver_name, p: o.receiver_phone };
+    const person = toPickup ? { n: o.sender_name, p: o.sender_phone } : { n: o.receiver_name, p: o.receiver_phone || o.sender_phone };
+    const hasPin = target.lat != null && target.lng != null;
+    const askMsg = t('ask_loc_msg', { no: o.tracking_no, what: t(toPickup ? 'what_pickup' : 'what_drop') });
+    const needDropPin = o.status === 'accepted' && o.dropoff_lat == null;
     return `<div class="card order-card">
       <div class="row">${o.status === 'assigned' ? `<span class="pill warn">🔔 ${t('new_order')}</span>` : ''}<b class="ltr">${esc(o.tracking_no)}</b><span class="spacer"></span>${SC.status(o.status)}</div>
       <div class="route">
-        <div class="pt"><span class="tag a">A</span><div><b>${t('pickup_point')}</b> · ${esc(SC.em(o.pickup_emirate))}<div class="small">${esc(o.pickup_address)}</div><div class="small muted">${esc(o.sender_name)} · <span class="ltr">${SC.phoneFmt(o.sender_phone)}</span></div></div></div>
-        <div class="pt"><span class="tag b">B</span><div><b>${t('drop_point')}</b> · ${esc(SC.em(o.dropoff_emirate))}<div class="small">${esc(o.dropoff_address)}</div><div class="small muted">${esc(o.receiver_name)} · <span class="ltr">${SC.phoneFmt(o.receiver_phone)}</span></div></div></div>
+        <div class="pt"><span class="tag a">A</span><div><b>${t('pickup_point')}</b> · ${esc(SC.em(o.pickup_emirate))}<div class="small">${esc(SC.addr(o, 'pickup'))}</div><div class="small muted">${esc(o.sender_name || '—')} · <span class="ltr">${SC.phoneFmt(o.sender_phone)}</span></div></div></div>
+        <div class="pt"><span class="tag b">B</span><div><b>${t('drop_point')}</b> · ${esc(SC.em(o.dropoff_emirate))}<div class="small">${esc(SC.addr(o, 'dropoff'))}</div><div class="small muted">${esc(o.receiver_name || '—')} · <span class="ltr">${SC.phoneFmt(o.receiver_phone)}</span></div></div></div>
       </div>
-      <div class="small muted" style="margin-bottom:8px">📦 ${esc(t('ct_' + o.content_type))} · ${o.weight_kg} ${t('kg')} · ${o.length_cm}×${o.width_cm}×${o.height_cm} ${t('cm')} · ${o.distance_km} ${t('km')}${o.description ? ' — ' + esc(o.description) : ''}</div>
+      <div class="small muted" style="margin-bottom:8px">📦 ${esc(SC.parcel(o))}${o.distance_km != null ? ' · ' + o.distance_km + ' ' + t('km') : ''} · ${SC.price(o)}${o.description ? ' — ' + esc(o.description) : ''}</div>
       ${o.photo_url ? `<img class="photo-thumb" src="${esc(o.photo_url)}" alt="" style="max-height:150px;margin-bottom:8px">` : ''}
       ${scope === 'active' ? cash : `<div class="small muted">${SC.date(o.delivered_at || o.updated_at)}${o.fail_reason ? ' — ' + esc(o.fail_reason) : ''}</div>`}
+      ${scope === 'active' && o.status !== 'assigned' && !hasPin ? `<div class="cash-banner" style="margin-top:8px">${t('no_pin')}</div>` : ''}
       ${scope === 'active' && o.status !== 'assigned' ? `<div class="actions">
-        <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="${SC.navLink(target.lat, target.lng)}">🧭 ${t('google')}</a>
-        <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="${SC.wazeLink(target.lat, target.lng)}">🚗 ${t('waze')}</a>
+        ${hasPin ? `<a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="${SC.navLink(target.lat, target.lng)}">🧭 ${t('google')}</a>
+        <a class="btn btn-ghost btn-sm" target="_blank" rel="noopener" href="${SC.wazeLink(target.lat, target.lng)}">🚗 ${t('waze')}</a>`
+        : `<a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="${SC.waLink(person.p, askMsg)}">${t('ask_loc')}</a>`}
+        ${!hasPin || needDropPin ? `<button class="btn btn-ghost btn-sm" data-act="setloc" data-target="${!hasPin ? (toPickup ? 'pickup' : 'dropoff') : 'dropoff'}" data-id="${o.id}">${t('set_loc')}${hasPin ? ' (B)' : ''}</button>` : ''}
         <a class="btn btn-ghost btn-sm" href="tel:+${esc(person.p)}">📞 ${t('call')}</a>
         <a class="btn btn-wa btn-sm" target="_blank" rel="noopener" href="${SC.waLink(person.p)}">${t('whatsapp')}</a></div>` : ''}
       ${actions ? `<div class="actions">${actions}</div>` : ''}
@@ -202,7 +208,7 @@
     });
   }
 
-  async function action(act, id) {
+  async function action(act, id, target) {
     const o = orders.find((x) => x.id === id);
     if (!o) return;
     try {
@@ -211,6 +217,12 @@
       else if (act === 'fail') { const reason = await SC.confirmBox(t('fail'), { danger: true, input: t('fail_q') }); if (!reason) return; let pos = {}; try { pos = await SC.getLocation(); } catch { /* */ } await api(`/api/driver/orders/${id}/fail`, { body: { reason, lat: pos.lat, lng: pos.lng } }); SC.toast(t('failed_ok'), 'ok'); render(); }
       else if (act === 'pickup' || act === 'deliver') proofModal(o, act);
       else if (act === 'chat') openOrderChat(o);
+      else if (act === 'setloc') {
+        const loc = await SC.confirmBox(t('set_loc'), { input: t('set_loc_q') });
+        if (!loc) return;
+        await api(`/api/driver/orders/${id}/location`, { body: { target, location: loc } });
+        SC.toast(t('loc_saved'), 'ok'); render();
+      }
     } catch (e) { SC.fail(e); }
   }
 

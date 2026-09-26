@@ -25,19 +25,43 @@ router.get('/config', wrap(async (req, res) => {
 }));
 
 // ---------- pricing ----------
+// Everything is optional. Exact coordinates are used when given; otherwise the emirate centre gives an estimate.
+// Without both emirates the price is "pending" and set later by operations.
+async function side(p, label) {
+  p = p || {};
+  if (p.lat !== undefined && p.lat !== null && p.lat !== '' && p.lng !== undefined && p.lng !== null && p.lng !== '') {
+    const r = await H.resolvePoint(p, label);
+    return { ...r, exact: true };
+  }
+  const emirate = p.emirate ? H.emirateCode(p.emirate) : null;
+  return { lat: null, lng: null, emirate, exact: false };
+}
+
 async function buildQuote(body) {
   const settings = await getSettings();
-  const pickup = await H.resolvePoint(body.pickup, 'pickup');
-  const dropoff = await H.resolvePoint(body.dropoff, 'dropoff');
+  const pickup = await side(body.pickup, 'pickup');
+  const dropoff = await side(body.dropoff, 'dropoff');
   const L = settings.limits;
-  const weight = H.num(body.weight_kg, { min: 0.1, max: L.max_weight_kg, name: 'weight' });
-  const l = H.num(body.length_cm, { min: 1, max: L.max_dim_cm, name: 'length' });
-  const w = H.num(body.width_cm, { min: 1, max: L.max_dim_cm, name: 'width' });
-  const h = H.num(body.height_cm, { min: 1, max: L.max_dim_cm, name: 'height' });
+  const weight = H.optNum(body.weight_kg, { min: 0.1, max: L.max_weight_kg, name: 'weight' });
+  const l = H.optNum(body.length_cm, { min: 1, max: L.max_dim_cm, name: 'length' });
+  const w = H.optNum(body.width_cm, { min: 1, max: L.max_dim_cm, name: 'width' });
+  const h = H.optNum(body.height_cm, { min: 1, max: L.max_dim_cm, name: 'height' });
   const method = ['online', 'cash_sender', 'cash_receiver'].includes(body.payment_method) ? body.payment_method : 'cash_sender';
-  const dist = await H.roadDistanceKm(pickup, dropoff);
-  const price = H.calcPrice(settings, { pickupEmirate: pickup.emirate, dropoffEmirate: dropoff.emirate, km: dist.km, weight, l, w, h, method });
-  price.distance_source = dist.source;
+  let price;
+  if (!pickup.emirate || !dropoff.emirate) {
+    price = { pending: true, total: 0 };
+  } else {
+    let dist;
+    const pt = (x) => (x.exact ? x : { lat: EMIRATES[x.emirate].lat, lng: EMIRATES[x.emirate].lng });
+    if (pickup.exact && dropoff.exact) dist = await H.roadDistanceKm(pickup, dropoff);
+    else if (pickup.emirate === dropoff.emirate) dist = { km: 0, source: 'estimate' };
+    else { dist = await H.roadDistanceKm(pt(pickup), pt(dropoff)); dist = { km: dist.km, source: 'estimate' }; }
+    const dims = l && w && h;
+    price = H.calcPrice(settings, { pickupEmirate: pickup.emirate, dropoffEmirate: dropoff.emirate, km: dist.km,
+      weight: weight || 0, l: dims ? l : 0, w: dims ? w : 0, h: dims ? h : 0, method });
+    price.distance_source = dist.source;
+    price.estimated = !(pickup.exact && dropoff.exact) || !weight;
+  }
   return { settings, pickup, dropoff, weight, l, w, h, method, price };
 }
 
@@ -47,23 +71,28 @@ router.post('/quote', trackLimiter, wrap(async (req, res) => {
 }));
 
 // ---------- create order ----------
+// Only the sender phone (for WhatsApp confirmation) and terms acceptance are mandatory.
 router.post('/orders', orderLimiter, wrap(async (req, res) => {
   const b = req.body || {};
   if (b.accept_terms !== true) throw bad('must_accept_terms');
   if (b.website) throw bad('rejected'); // honeypot
   const qt = await buildQuote(b);
-  if (qt.method === 'online' && !pay.enabled()) throw bad('online_payment_unavailable');
+  if (qt.method === 'online' && (!pay.enabled() || qt.price.pending)) throw bad('online_payment_unavailable');
 
-  const sender_name = H.str(b.sender_name, { min: 2, max: 80, name: 'sender_name' });
+  const opt = (v, max, name) => H.str(v, { max, name }) || null;
   const sender_phone = H.phone(b.sender_phone, 'sender_phone');
-  const pickup_address = H.str(b.pickup_address, { min: 3, max: 300, name: 'pickup_address' });
-  const receiver_name = H.str(b.receiver_name, { min: 2, max: 80, name: 'receiver_name' });
-  const receiver_phone = H.phone(b.receiver_phone, 'receiver_phone');
-  const dropoff_address = H.str(b.dropoff_address, { min: 3, max: 300, name: 'dropoff_address' });
-  const content_type = H.str(b.content_type, { min: 2, max: 80, name: 'content_type' });
+  const sender_name = opt(b.sender_name, 80, 'sender_name');
+  const pickup_area = H.str(b.pickup_area, { max: 120, name: 'pickup_area' });
+  const pickup_address = opt(b.pickup_address, 300, 'pickup_address');
+  const receiver_name = opt(b.receiver_name, 80, 'receiver_name');
+  const receiver_phone = b.receiver_phone && String(b.receiver_phone).trim() ? H.phone(b.receiver_phone, 'receiver_phone') : null;
+  const dropoff_area = H.str(b.dropoff_area, { max: 120, name: 'dropoff_area' });
+  const dropoff_address = opt(b.dropoff_address, 300, 'dropoff_address');
+  const content_type = opt(b.content_type, 80, 'content_type');
   const description = H.str(b.description, { max: 500, name: 'description' });
-  const declared_value = b.declared_value === '' || b.declared_value == null ? null : H.num(b.declared_value, { min: 0, max: 1000000, name: 'declared_value' });
-  const photoId = await H.saveDataUrl(b.photo, { required: true, name: 'photo' });
+  const declared_value = H.optNum(b.declared_value, { min: 0, max: 1000000, name: 'declared_value' });
+  const photoId = await H.saveDataUrl(b.photo, { required: false, name: 'photo' });
+  const pending = !!qt.price.pending;
 
   let tracking; let order;
   for (let i = 0; i < 5 && !order; i++) {
@@ -74,32 +103,37 @@ router.post('/orders', orderLimiter, wrap(async (req, res) => {
            sender_name, sender_phone, pickup_address, pickup_lat, pickup_lng, pickup_emirate,
            receiver_name, receiver_phone, dropoff_address, dropoff_lat, dropoff_lng, dropoff_emirate,
            weight_kg, length_cm, width_cm, height_cm, content_type, description, declared_value, photo_id,
-           distance_km, delivery_code, created_ip)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28)
+           distance_km, delivery_code, created_ip, pickup_area, dropoff_area, price_pending, price_estimated)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32)
          RETURNING *`,
-        [tracking, qt.method === 'online' ? 'awaiting_payment' : 'pending', qt.method, qt.price.total, JSON.stringify(qt.price),
+        [tracking, qt.method === 'online' ? 'awaiting_payment' : 'pending', qt.method, pending ? 0 : qt.price.total, JSON.stringify(qt.price),
           sender_name, sender_phone, pickup_address, qt.pickup.lat, qt.pickup.lng, qt.pickup.emirate,
           receiver_name, receiver_phone, dropoff_address, qt.dropoff.lat, qt.dropoff.lng, qt.dropoff.emirate,
           qt.weight, qt.l, qt.w, qt.h, content_type, description, declared_value, photoId,
-          qt.price.distance_km, H.genCode(), req.ip]
+          pending ? null : qt.price.distance_km, H.genCode(), req.ip, pickup_area, dropoff_area, pending, !pending && !!qt.price.estimated]
       );
       order = rows[0];
     } catch (e) { if (e.code !== '23505') throw e; }
   }
   if (!order) throw new Error('could_not_allocate_tracking');
 
-  await O.addEvent(order.id, 'created', { type: 'customer', name: sender_name });
+  await O.addEvent(order.id, 'created', { type: 'customer', name: sender_name || sender_phone });
   let checkout_url = null;
   if (qt.method === 'online') {
     await O.addEvent(order.id, 'payment_pending', { type: 'system' });
     checkout_url = await pay.createCheckout(req, order);
   } else {
     await O.addEvent(order.id, 'pending', { type: 'system' });
-    await rt.notifyAdmins('new_order', 'New order', `${order.tracking_no} — ${order.pickup_emirate} → ${order.dropoff_emirate}`, order.id);
+    const missing = [];
+    if (order.pickup_lat == null) missing.push('pickup location');
+    if (order.dropoff_lat == null) missing.push('delivery location');
+    if (pending) missing.push('price');
+    await rt.notifyAdmins('new_order', 'New order', `${order.tracking_no} — ${order.pickup_emirate || '?'} → ${order.dropoff_emirate || '?'}${missing.length ? ' · needs: ' + missing.join(', ') : ''}`, order.id);
     rt.orderChanged(order);
   }
   H.grantCustomer(req, res, [order.id]);
-  res.status(201).json({ id: order.id, tracking_no: order.tracking_no, delivery_code: order.delivery_code, amount: Number(order.amount), status: order.status, checkout_url });
+  res.status(201).json({ id: order.id, tracking_no: order.tracking_no, delivery_code: order.delivery_code, amount: Number(order.amount),
+    price_pending: pending, price_estimated: order.price_estimated, status: order.status, checkout_url });
 }));
 
 // ---------- tracking ----------
@@ -119,7 +153,7 @@ router.get('/track', trackLimiter, wrap(async (req, res) => {
   const ids = rows.map((r) => r.id);
   H.grantCustomer(req, res, ids);
   const { rows: list } = await q(
-    `SELECT id, tracking_no, status, payment_status, payment_method, amount, pickup_emirate, dropoff_emirate, sender_name, receiver_name, created_at
+    `SELECT id, tracking_no, status, payment_status, payment_method, amount, price_pending, price_estimated, pickup_emirate, dropoff_emirate, sender_name, receiver_name, created_at
        FROM orders WHERE id = ANY($1) ORDER BY created_at DESC`, [ids]
   );
   res.json({ orders: list.map((o) => ({ ...o, amount: Number(o.amount) })) });
