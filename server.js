@@ -72,17 +72,32 @@ const PUB = path.join(__dirname, 'public');
 const PAGES = { '/': 'index.html', '/order': 'order.html', '/track': 'track.html', '/admin': 'admin.html', '/driver': 'driver.html', '/complaints': 'complaints.html', '/privacy': 'privacy.html', '/terms': 'terms.html', '/cookies': 'cookies.html' };
 // Asset URLs get a per-deploy version so browsers never mix old cached JS/CSS with new HTML.
 const BUILD = (process.env.RENDER_GIT_COMMIT || String(Date.now())).slice(0, 10);
+const seo = require('./lib/seo');
 const pageCache = {};
-const renderPage = (file) => pageCache[file] || (pageCache[file] = require('fs').readFileSync(path.join(PUB, file), 'utf8')
+const renderPage = (route, file) => pageCache[route] || (pageCache[route] = seo.enhance(route, require('fs').readFileSync(path.join(PUB, file), 'utf8'), PUB)
   .replace(/(href|src)="(\/(?:css|js)\/[^"?]+\.(?:css|js))"/g, `$1="$2?v=${BUILD}"`));
 for (const [route, file] of Object.entries(PAGES)) {
-  app.get(route, (req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.type('html').send(renderPage(file)); });
+  app.get(route, (req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.type('html').send(renderPage(route, file)); });
 }
+// Search engines, link sharing and "add to home screen"
+const LASTMOD = new Date().toISOString().slice(0, 10);
+app.get('/robots.txt', (req, res) => res.type('text/plain').send(seo.robots()));
+app.get('/sitemap.xml', (req, res) => res.type('application/xml').send(seo.sitemap(LASTMOD)));
+app.get('/manifest.webmanifest', (req, res) => res.type('application/manifest+json').send(seo.manifest()));
+// Short, easy-to-share links
+app.get(['/ship', '/shipping', '/new'], (req, res) => res.redirect(301, '/order'));
+app.get(['/tracking', '/t'], (req, res) => res.redirect(301, '/track'));
+app.get('/t/:no', (req, res) => res.redirect(302, '/track?no=' + encodeURIComponent(String(req.params.no).toUpperCase().slice(0, 20))));
+// Old-style .html URLs point to the clean address (one URL per page for search engines)
+app.get(/^\/([a-z]+)\.html$/, (req, res, next) => {
+  const route = req.params[0] === 'index' ? '/' : '/' + req.params[0];
+  return PAGES[route] ? res.redirect(301, route) : next();
+});
 app.use('/vendor/leaflet', express.static(path.join(__dirname, 'node_modules', 'leaflet', 'dist'), { maxAge: '7d' }));
 app.use(express.static(PUB, { index: false, extensions: ['html'], maxAge: '1h' }));
 
 app.use('/api', (req, res) => res.status(404).json({ error: 'not_found' }));
-app.use((req, res) => res.status(404).sendFile(path.join(PUB, 'index.html')));
+app.use((req, res) => res.status(404).type('html').send(renderPage('/', 'index.html')));
 
 // Error handler
 // eslint-disable-next-line no-unused-vars
