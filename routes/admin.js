@@ -394,6 +394,34 @@ router.post('/notifications/read', wrap(async (req, res) => {
 
 // ---------- settings ----------
 router.get('/settings', wrap(async (req, res) => res.json(await getSettings())));
+// Full data backup (super admin): JSON with every table; binary columns as base64. Restore with scripts/restore.js.
+const BACKUP_TABLES = ['settings', 'users', 'drivers', 'attendance', 'files', 'orders', 'order_events', 'messages', 'complaints', 'ratings', 'notifications'];
+router.get('/backup', requireSuperAdmin, wrap(async (req, res) => {
+  const stamp = new Date().toISOString().slice(0, 16).replace(/[:T]/g, '-');
+  res.setHeader('Content-Type', 'application/json; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="sevencargo-backup-${stamp}.json"`);
+  res.setHeader('Cache-Control', 'no-store');
+  res.write(`{"app":"sevencargo","format":1,"created_at":${JSON.stringify(new Date().toISOString())},"tables":{`);
+  for (let i = 0; i < BACKUP_TABLES.length; i++) {
+    const t = BACKUP_TABLES[i];
+    res.write(`${i ? ',' : ''}${JSON.stringify(t)}:[`);
+    let last = null; let first = true;
+    // page through by ctid-free ordering to keep memory small (files can be large)
+    const key = t === 'settings' ? 'key' : 'id';
+    for (;;) {
+      const { rows } = await q(`SELECT * FROM ${t} ${last === null ? '' : `WHERE ${key} > $1`} ORDER BY ${key} LIMIT 200`, last === null ? [] : [last]);
+      for (const r of rows) {
+        for (const [k, v] of Object.entries(r)) if (Buffer.isBuffer(v)) r[k] = { $b64: v.toString('base64') };
+        res.write((first ? '' : ',') + JSON.stringify(r)); first = false;
+      }
+      if (rows.length < 200) break;
+      last = rows[rows.length - 1][key];
+    }
+    res.write(']');
+  }
+  res.end('}}');
+}));
+
 router.put('/settings', requireSuperAdmin, wrap(async (req, res) => {
   const b = req.body || {};
   const cur = await getSettings();
