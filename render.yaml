@@ -16,6 +16,7 @@ services:
     branch: main
     buildCommand: npm install
     startCommand: node server.js
+    healthCheckPath: /healthz
     autoDeployTrigger: off
     envVars:
       - key: DATABASE_URL
