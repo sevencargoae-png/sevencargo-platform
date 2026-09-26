@@ -70,8 +70,13 @@ app.get('/files/:id', H.wrap(async (req, res) => {
 // Pages (clean URLs)
 const PUB = path.join(__dirname, 'public');
 const PAGES = { '/': 'index.html', '/order': 'order.html', '/track': 'track.html', '/admin': 'admin.html', '/driver': 'driver.html', '/complaints': 'complaints.html', '/privacy': 'privacy.html', '/terms': 'terms.html', '/cookies': 'cookies.html' };
+// Asset URLs get a per-deploy version so browsers never mix old cached JS/CSS with new HTML.
+const BUILD = (process.env.RENDER_GIT_COMMIT || String(Date.now())).slice(0, 10);
+const pageCache = {};
+const renderPage = (file) => pageCache[file] || (pageCache[file] = require('fs').readFileSync(path.join(PUB, file), 'utf8')
+  .replace(/(href|src)="(\/(?:css|js)\/[^"?]+\.(?:css|js))"/g, `$1="$2?v=${BUILD}"`));
 for (const [route, file] of Object.entries(PAGES)) {
-  app.get(route, (req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.sendFile(path.join(PUB, file)); });
+  app.get(route, (req, res) => { res.setHeader('Cache-Control', 'no-cache'); res.type('html').send(renderPage(file)); });
 }
 app.use('/vendor/leaflet', express.static(path.join(__dirname, 'node_modules', 'leaflet', 'dist'), { maxAge: '7d' }));
 app.use(express.static(PUB, { index: false, extensions: ['html'], maxAge: '1h' }));
